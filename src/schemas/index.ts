@@ -10,4 +10,4 @@ const connectMongoose = () => {
   });
 };
 
-module.exports = connectMongoose;
+export const Connect = connectMongoose;

@@ -3,7 +3,7 @@ import { NewsInf } from "../interface/news";
 
 const { Schema } = mongoose;
 const newsSchema = new Schema<NewsInf>({
-  order: { type: Number, require: true },
+  order: { type: Number, require: true, unique: true },
   title: { type: String, require: true },
   summary: { type: String, require: true },
   news: { type: [{ date: Date, title: String, link: String }], require: true },

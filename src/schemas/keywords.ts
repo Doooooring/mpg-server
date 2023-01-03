@@ -7,7 +7,9 @@ const {
 
 const keywordSchema = new Schema({
   keyword: String,
+  explain: String,
   category: String,
+  recent: Boolean,
   news: {
     type: [ObjectId],
     ref: "News",
