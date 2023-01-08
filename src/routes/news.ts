@@ -8,11 +8,11 @@ const router = express.Router();
 // 기사 목록
 router.route("/summary").get(async (req: Request, res: Response) => {
   const { curNum, keyword } = req.query;
-  if (keyword === "") {
+  if (keyword === undefined) {
     try {
       const newsContents = await News.find({})
         .sort({ state: -1, order: -1 })
-        .select("title summary keywords")
+        .select("order, title summary keywords state")
         .skip(Number(curNum))
         .limit(20);
       res.send(JSON.stringify(newsContents));
@@ -25,7 +25,7 @@ router.route("/summary").get(async (req: Request, res: Response) => {
         keywords: { $regex: `${keyword}` },
       })
         .sort({ state: -1, order: -1 })
-        .select("title summary keywords")
+        .select("order title summary keywords state")
         .skip(Number(curNum))
         .limit(20);
       response.send(JSON.stringify(newsContents));
