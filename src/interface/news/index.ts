@@ -1,19 +1,20 @@
 import { Types } from "mongoose";
 
 export interface NewsInf {
-  order: Number;
-  title: String;
-  summary: String;
-  news: Array<{ date: Date; title: String; link: String }>;
-  journals: Array<{ press: String; title: String; link: String }>;
-  keywords: Array<String>;
+  _id: Types.ObjectId;
+  order: number;
+  title: string;
+  summary: string;
+  news: Array<{ date: Date; title: string; link: string }>;
+  journals: Array<{ press: string; title: string; link: string }>;
+  keywords: Array<string>;
   state: Boolean;
   opinions: {
-    left: String;
-    right: String;
+    left: string;
+    right: string;
   };
   votes: {
-    left: Number;
-    right: Number;
+    left: number;
+    right: number;
   };
 }

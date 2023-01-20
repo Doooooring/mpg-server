@@ -10,10 +10,7 @@ const keywordSchema = new Schema({
   explain: String,
   category: String,
   recent: Boolean,
-  news: {
-    type: [ObjectId],
-    ref: "News",
-  },
+  news: [{ type: ObjectId, ref: "News" }],
 });
 
 export const Keywords = mongoose.model("Keywords", keywordSchema);

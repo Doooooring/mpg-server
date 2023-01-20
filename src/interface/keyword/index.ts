@@ -1,4 +1,5 @@
-import { ObjectId } from "mongoose";
+import { NewsInf } from "../news";
+import mongoose from "mongoose";
 
 export enum category {
   human = "인물",
@@ -10,9 +11,10 @@ export enum category {
   etc = "기타",
 }
 export interface KeywordInf {
-  keyword: String;
-  explain: String;
-  category: String;
+  _id: mongoose.Types.ObjectId;
+  keyword: string;
+  explain: string;
+  category: category;
   recent: Boolean;
-  news: Array<ObjectId>;
+  news: Array<mongoose.Types.ObjectId>;
 }
