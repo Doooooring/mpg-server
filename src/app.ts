@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 
+import bodyParser from "body-parser";
+
 import { Connect } from "./schemas/index";
 import { newsRoute } from "./routes/news";
 import { keywordRoute } from "./routes/keywords";
@@ -7,6 +9,8 @@ import { keywordRoute } from "./routes/keywords";
 const app = express();
 
 app.set("port", process.env.PORT || 3000);
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 Connect();
 
 app.use(express.urlencoded({ extended: false })); //x-mmm? 인가 하는 거 받는거
