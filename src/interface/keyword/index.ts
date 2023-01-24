@@ -11,7 +11,6 @@ export enum category {
   etc = "기타",
 }
 export interface KeywordInf {
-  _id: mongoose.Types.ObjectId;
   keyword: string;
   explain: string;
   category: category;

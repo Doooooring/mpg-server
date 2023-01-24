@@ -5,12 +5,17 @@ const {
   Types: { ObjectId },
 } = Schema;
 
-const keywordSchema = new Schema({
-  keyword: String,
-  explain: String,
-  category: String,
-  recent: Boolean,
-  news: [{ type: ObjectId, ref: "News" }],
-});
+const keywordSchema = new Schema(
+  {
+    keyword: String,
+    explain: String,
+    category: String,
+    recent: Boolean,
+    news: [{ type: ObjectId, ref: "News" }],
+  },
+  {
+    versionKey: false,
+  }
+);
 
 export const Keywords = mongoose.model("Keywords", keywordSchema);

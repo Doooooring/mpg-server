@@ -40,6 +40,16 @@ router.route("/summary").get(async (req: Request, res: Response) => {
 
 router
   .route("/keyword")
+  .get(async (req: Request, res: Response) => {
+    const { keyword } = req.params;
+    try {
+      const NewsList = await Keywords.findOne({ keyword: keyword });
+      const response = await News.find({ _id: { $in: NewsList } });
+      res.send(response);
+    } catch {
+      res.send("no");
+    }
+  })
   .post(async (req: Request, res: Response) => {
     interface reqBody {
       _id: mongoose.Types.ObjectId;
@@ -110,6 +120,7 @@ router
   .get(async (req: Request, res: Response) => {
     const { id } = req.params;
     const contentToSend = await News.findOne({ _id: id });
+    res.send(contentToSend);
   })
   .patch();
 
