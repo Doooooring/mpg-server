@@ -17,17 +17,43 @@ const router = express.Router();
 
 router.route("/delete").delete(async (req: Request, res: Response) => {
   const response = await Keywords.deleteMany({});
-  res.send(response);
+  res.send(JSON.stringify(response));
 });
 
 router
   .route("/keyword")
   .get(async (req: Request, res: Response) => {
     const response = await Keywords.find({}).select("keyword");
-    console.log(response);
-    res.send(response);
+
+    res.send(JSON.stringify(response));
   })
   .patch();
+
+router.route("/detail").get(async (req: Request, res: Response) => {
+  const { curNum, keyName } = req.params;
+  const keyword = await Keywords.findOne({ keyword: keyName })
+  .select("keyword")
+  ;
+  if (keyword === null) {
+    res.send("none");
+    return;
+  }
+  const { news } = keyword;
+  const previews = await News.find({
+    _id: {
+      $in: news,
+    },
+  })
+    .sort({ state: -1, order: -1 })
+    .select("order title summary keywords state")
+    .skip(Number(curNum))
+    .limit(20);
+  const response = {
+    keyword: keyword,
+    previews: previews,
+  };
+  res.send(JSON.stringify(response));
+});
 
 //특정 카테고리의 키워드 불러오기
 router
@@ -54,7 +80,7 @@ router
       {
         $group: {
           _id: "$category",
-          top: {
+          keywords: {
             $topN: {
               n: 10,
               sortBy: { keyword: -1 },

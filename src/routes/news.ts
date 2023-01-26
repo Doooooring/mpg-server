@@ -9,7 +9,7 @@ const app = express();
 const router = express.Router();
 
 // 기사 목록
-router.route("/summary").get(async (req: Request, res: Response) => {
+router.route("/preview").get(async (req: Request, res: Response) => {
   const { curNum, keyword } = req.query;
   if (keyword === undefined) {
     try {
@@ -85,40 +85,44 @@ router
       keywords: string[];
     }
     const { _id, keywords }: reqBody = req.body;
+    try {
+      const response = await News.findOne({ _id: _id }).select("keywords");
 
-    const response = await News.findOne({ _id: _id }).select("keywords");
-
-    if (response) {
-      const { keywords: beforeKeywords } = response;
-      const deleteKeys = beforeKeywords.filter((keyword) => {
-        return !keywords.includes(keyword);
-      });
-      const addKeys = keywords.filter((keyword) => {
-        return !beforeKeywords.includes(keyword);
-      });
-      const deleteResponse = await Keywords.updateMany(
-        {
-          keyword: { $in: deleteKeys },
-        },
-        { news: { $pull: _id } }
-      );
-      const addResponse = await Keywords.updateMany(
-        {
-          keyword: { $in: addKeys },
-        },
-        {
-          news: { $push: _id },
-        }
-      );
-      res.send(true);
+      if (response) {
+        const { keywords: beforeKeywords } = response;
+        const deleteKeys = beforeKeywords.filter((keyword) => {
+          return !keywords.includes(keyword);
+        });
+        const addKeys = keywords.filter((keyword) => {
+          return !beforeKeywords.includes(keyword);
+        });
+        const deleteResponse = await Keywords.updateMany(
+          {
+            keyword: { $in: deleteKeys },
+          },
+          { news: { $pull: _id } }
+        );
+        const addResponse = await Keywords.updateMany(
+          {
+            keyword: { $in: addKeys },
+          },
+          {
+            news: { $push: _id },
+          }
+        );
+        res.send(true);
+      }
+    } catch (e) {
+      res.send(e);
+      console.error(e);
     }
   });
 
 // 기사 상세
 router
-  .route("/:id")
+  .route("/detail")
   .get(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { id } = req.query;
     const contentToSend = await News.findOne({ _id: id });
     res.send(contentToSend);
   })
