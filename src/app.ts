@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 
 import bodyParser from "body-parser";
+import cors from "cors";
 
 import { Connect } from "./schemas/index";
 import { newsRoute } from "./routes/news";
@@ -9,6 +10,7 @@ import { keywordRoute } from "./routes/keywords";
 const app = express();
 
 app.set("port", process.env.PORT || 3000);
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 Connect();
