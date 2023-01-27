@@ -30,10 +30,10 @@ router
   .patch();
 
 router.route("/detail").get(async (req: Request, res: Response) => {
-  const { curNum, keyName } = req.params;
-  const keyword = await Keywords.findOne({ keyword: keyName })
-  .select("keyword")
-  ;
+  const { curNum, keyName } = req.query;
+  const keyword = await Keywords.findOne({ keyword: keyName }).select(
+    "keyword explain"
+  );
   if (keyword === null) {
     res.send("none");
     return;
