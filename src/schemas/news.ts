@@ -28,8 +28,13 @@ const newsSchema = new Schema<NewsInf>(
       type: {
         left: Number,
         right: Number,
+        none: Number,
       },
-      require: true,
+      default: {
+        left: 1,
+        right: 1,
+        null: 1,
+      },
     },
   },
   {

@@ -8,6 +8,7 @@ import { NewsInf } from "../interface/news";
 import { KeywordInf } from "../interface/keyword";
 import { RequestListener } from "http";
 import { Console } from "console";
+import { KeywordSyntaxKind } from "typescript";
 
 const app = express();
 app.use(bodyParser.json());
@@ -24,15 +25,17 @@ router
   .route("/keyword")
   .get(async (req: Request, res: Response) => {
     const response = await Keywords.find({}).select("keyword");
-
-    res.send(JSON.stringify(response));
+    const keywordToSend = response.map((keyInfo) => {
+      return keyInfo.keyword;
+    });
+    res.send(JSON.stringify(keywordToSend));
   })
   .patch();
 
 router.route("/detail").get(async (req: Request, res: Response) => {
   const { curNum, keyName } = req.query;
   const keyword = await Keywords.findOne({ keyword: keyName }).select(
-    "keyword explain"
+    "keyword explain news"
   );
   if (keyword === null) {
     res.send("none");
@@ -82,7 +85,7 @@ router
           _id: "$category",
           keywords: {
             $topN: {
-              n: 10,
+              n: 80,
               sortBy: { keyword: -1 },
               output: {
                 _id: "$_id",

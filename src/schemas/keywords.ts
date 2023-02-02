@@ -7,11 +7,11 @@ const {
 
 const keywordSchema = new Schema(
   {
-    keyword: String,
-    explain: String,
-    category: String,
-    recent: Boolean,
-    news: [{ type: ObjectId, ref: "News" }],
+    keyword: { type: String, required: true },
+    explain: { type: String, required: true },
+    category: { type: String, required: true },
+    recent: { type: Boolean, required: true },
+    news: { type: [String] },
   },
   {
     versionKey: false,

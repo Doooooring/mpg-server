@@ -16,5 +16,6 @@ export interface NewsInf {
   votes: {
     left: number;
     right: number;
+    none: number;
   };
 }

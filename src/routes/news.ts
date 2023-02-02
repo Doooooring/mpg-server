@@ -8,10 +8,21 @@ import { News } from "../schemas/news";
 const app = express();
 const router = express.Router();
 
+router.route("/test").get(async (req: Request, res: Response) => {
+  console.log("herehre");
+  const response = await News.findOne({
+    "journals.press": "조선",
+  }).select("journals.press");
+  console.log(response);
+  res.send(response);
+});
+
 // 기사 목록
 router.route("/preview").get(async (req: Request, res: Response) => {
   const { curNum, keyword } = req.query;
-  if (keyword === undefined) {
+  console.log(curNum);
+  console.log(keyword);
+  if (keyword === "null") {
     try {
       const newsContents = await News.find({})
         .sort({ state: -1, order: -1 })
@@ -24,14 +35,22 @@ router.route("/preview").get(async (req: Request, res: Response) => {
     }
   } else {
     try {
+      const response = await Keywords.findOne({
+        keyword: keyword,
+      }).select("news");
+      if (response === null) {
+        res.send("Nothings");
+        return;
+      }
+      const { news } = response;
       const newsContents = await News.find({
-        keywords: { $regex: `${keyword}` },
+        _id: { $in: news },
       })
         .sort({ state: -1, order: -1 })
         .select("order title summary keywords state")
         .skip(Number(curNum))
         .limit(20);
-      response.send(JSON.stringify(newsContents));
+      res.send(JSON.stringify(newsContents));
     } catch (err) {
       console.error(err);
     }
@@ -51,32 +70,36 @@ router
     }
   })
   .post(async (req: Request, res: Response) => {
-    interface reqBody {
-      _id: mongoose.Types.ObjectId;
-      keywords: string[];
-    }
     const { _id, keywords } = req.body;
+    console.log(keywords);
     try {
-      for (const keyword of keywords) {
-        const response = await Keywords.findOne({ keyword: keyword });
-        if (response === null) {
-          Error("Not exists");
-        }
+      const checkExists = await Keywords.find({ keyword: { $in: keywords } });
+      console.log(checkExists);
+      if (checkExists.length === 0) {
+        console.log("here");
+        Error("Not exists");
       }
-      const response = await News.findOneAndUpdate(
+
+      const response1 = await News.findOneAndUpdate(
         { _id: _id },
         { keywords: keywords }
       );
-      await Keywords.updateMany(
+
+      const response2 = await Keywords.updateMany(
         {
           keyword: { $in: keywords },
         },
         {
-          news: { $push: _id },
+          $push: { news: _id },
         }
       );
+      res.send({
+        news: response1,
+        keywords: response2,
+      });
     } catch (e) {
-      res.send(e);
+      console.error(e);
+      res.send("Not good ");
     }
   })
   .patch(async (req: Request, res: Response) => {
