@@ -86,11 +86,10 @@ router.route("/").post(async (req: Request, res: Response) => {
         const today = new Date();
         const shasum = crypto.createHash("sha1");
         shasum.update(today.toLocaleTimeString());
-        const userId = shasum.digest("hex");
-        const token = VoteService.sign(userId);
+        const token = shasum.digest("hex");
         const newsUpdate = await updateNews(news, response, 1);
         const voteUpdate = await Vote.create({
-          user: userId,
+          user: token,
           vote: [
             {
               news: `${response}`,
@@ -164,11 +163,10 @@ router.route("/").post(async (req: Request, res: Response) => {
       const today = new Date();
       const shasum = crypto.createHash("sha1");
       shasum.update(today.toLocaleTimeString());
-      const userId = shasum.digest("hex");
-      const token = VoteService.sign(userId);
+      const token = shasum.digest("hex");
       const newsUpdate = await updateNews(news, response, 1);
       const voteUpdate = await Vote.create({
-        user: userId,
+        user: token,
         vote: [
           {
             news: `${response}`,
