@@ -15,5 +15,5 @@ export interface KeywordInf {
   explain: string;
   category: category;
   recent: Boolean;
-  news: Array<mongoose.Types.ObjectId>;
+  news: Array<string>;
 }
