@@ -8,7 +8,7 @@ const newsSchema = new Schema<NewsInf>(
     title: { type: String, require: true },
     summary: { type: String, require: true },
     news: {
-      type: [{ date: Date, title: String, link: String }],
+      type: [{ date: String, title: String, link: String }],
       require: true,
     },
     journals: {
@@ -33,7 +33,7 @@ const newsSchema = new Schema<NewsInf>(
       default: {
         left: 1,
         right: 1,
-        null: 1,
+        none: 1,
       },
     },
   },

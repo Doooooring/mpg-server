@@ -124,7 +124,11 @@ router
       if (news.length !== 0) {
         const response2 = await News.updateMany(
           { order: { $in: news } },
-          { keywords: { $push: keyword } }
+          {
+            $push: {
+              keywords: keyword,
+            },
+          }
         );
       }
       console.log(response1);
@@ -164,7 +168,11 @@ router
         try {
           const response = await News.updateMany(
             { _id: { $in: deleteNews } },
-            { keywords: { $pull: keyword } }
+            {
+              $pull: {
+                keywords: keyword,
+              },
+            }
           );
         } catch (e) {
           console.log(e);
@@ -178,7 +186,9 @@ router
               _id: { $in: addNews },
             },
             {
-              keywords: { $push: keyword },
+              $push: {
+                keywords: keyword,
+              },
             }
           );
         } catch (e) {

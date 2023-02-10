@@ -2,8 +2,6 @@ import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import crypto from "crypto";
 
-import VoteService from "../utils/vote";
-
 import { News } from "../schemas/news";
 import { Vote } from "../schemas/vote";
 
@@ -17,7 +15,6 @@ router.route("/:userId").get((req: Request, res: Response) => {
 });
 
 interface VoteRequestBody {
-  id: string | null;
   news: string;
   response: "left" | "right" | "none";
 }
@@ -27,42 +24,41 @@ async function updateNews(
   choice: "left" | "right" | "none",
   upDown: 1 | -1
 ) {
-  let response;
-  switch (choice) {
-    case "left":
-      response = await News.updateOne(
-        { _id: id },
-        {
-          $inc: {
-            left: upDown,
-          },
-        }
-      );
-
-    case "right":
-      response = await News.updateOne(
-        {
-          _id: id,
+  if (choice === "left") {
+    const response = await News.updateOne(
+      { _id: id },
+      {
+        $inc: {
+          "votes.left": upDown,
         },
-        {
-          $inc: {
-            right: upDown,
-          },
-        }
-      );
-    case "none":
-      response = await News.updateOne(
-        {
-          _id: id,
+      }
+    );
+    return response;
+  } else if (choice === "right") {
+    const response = await News.updateOne(
+      {r
+        _id: id,
+      },
+      {
+        $inc: {
+          "votes.right": upDown,
         },
-        {
-          $inc: {
-            none: upDown,
-          },
-        }
-      );
+      }
+    );
+    return response;
+  } else {
+    const response = await News.updateOne(
+      {
+        _id: id,
+      },
+      {
+        $inc: {
+          "votes.none": upDown,
+        },
+      }
+    );
+    return response;
   }
-  return response;
 }
 
 interface HaveVoted {
@@ -79,7 +75,7 @@ router.route("/").post(async (req: Request, res: Response) => {
   const { news, response } = requestBody;
 
   if (authorization !== null && authorization !== undefined) {
-    const id = authorization.split("Bearer ")[1];
+    const id = authorization;
     const existed = await Vote.findOne({ user: id });
     if (existed === null) {
       try {
@@ -88,6 +84,7 @@ router.route("/").post(async (req: Request, res: Response) => {
         shasum.update(today.toLocaleTimeString());
         const token = shasum.digest("hex");
         const newsUpdate = await updateNews(news, response, 1);
+
         const voteUpdate = await Vote.create({
           user: token,
           vote: [
@@ -113,8 +110,8 @@ router.route("/").post(async (req: Request, res: Response) => {
               user: id,
             },
             {
-              vote: {
-                $push: {
+              $addToSet: {
+                vote: {
                   news: news,
                   response: response,
                 },
@@ -135,17 +132,21 @@ router.route("/").post(async (req: Request, res: Response) => {
           const oldResponse = oldComp[0].response;
           const oldNewsUpdate = await updateNews(news, oldResponse, -1);
           const newsUpdate = await updateNews(news, response, 1);
-          const voteUpdate = await Vote.updateOne(
+          const votePull = await Vote.updateOne(
             { user: id },
             {
-              vote: {
-                $pull: {
+              $pull: {
+                vote: {
                   news: news,
                 },
-                $push: {
-                  news: news,
-                  response: response,
-                },
+              },
+            }
+          );
+          const votePush = await Vote.updateOne(
+            { user: id },
+            {
+              $push: {
+                vote: { news: news, response: response },
               },
             }
           );
@@ -155,6 +156,7 @@ router.route("/").post(async (req: Request, res: Response) => {
           });
         }
       } catch (e) {
+        console.error(e);
         res.send(e);
       }
     }
@@ -169,12 +171,14 @@ router.route("/").post(async (req: Request, res: Response) => {
         user: token,
         vote: [
           {
-            news: `${response}`,
+            news: news,
+            response: `${response}`,
           },
         ],
       });
       res.send({ state: true, token: token });
     } catch (e) {
+      console.error(e);
       res.send(e);
     }
   }
