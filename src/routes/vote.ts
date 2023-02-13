@@ -36,7 +36,7 @@ async function updateNews(
     return response;
   } else if (choice === "right") {
     const response = await News.updateOne(
-      {r
+      {
         _id: id,
       },
       {

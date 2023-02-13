@@ -105,7 +105,6 @@ router
     res.send(JSON.stringify(response));
   })
   .post(async (req: Request, res: Response) => {
-    console.log("here");
     const newKeyword = req.body;
     const { keyword, news } = newKeyword;
     if (news === "") {
