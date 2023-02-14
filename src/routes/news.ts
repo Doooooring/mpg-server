@@ -35,7 +35,8 @@ router.route("/preview").get(async (req: Request, res: Response) => {
         .limit(20);
       res.send(JSON.stringify(newsContents));
     } catch (err) {
-      console.error(err);
+      res.send(err);
+      console.log(err);
     }
   } else {
     try {
@@ -56,7 +57,8 @@ router.route("/preview").get(async (req: Request, res: Response) => {
         .limit(20);
       res.send(JSON.stringify(newsContents));
     } catch (err) {
-      console.error(err);
+      res.send(err);
+      console.log(err);
     }
   }
 });
@@ -155,7 +157,6 @@ router
     const { id } = req.query;
     const token = req.headers.authorization;
     const contentToSend = await News.findOne({ _id: id });
-    console.log(contentToSend);
     if (token === null) {
       res.send({
         response: null,
@@ -169,7 +170,6 @@ router
           news: contentToSend,
         });
       } else {
-        console.log("here");
         const userVote = user.vote;
         const curNews = userVote.filter((comp) => {
           return comp.news === id;
@@ -192,11 +192,25 @@ router
     res.send("here");
   })
   .post(async (req: Request, res: Response) => {
-    const totalNum = await News.estimatedDocumentCount();
-    const news: NewsInf = { order: totalNum + 1, ...req.body };
     try {
-      const keywordState = news["state"];
+      const totalNum = await News.estimatedDocumentCount();
+      const news: NewsInf = { order: totalNum + 1, ...req.body };
+
       const keywordList = news["keywords"];
+
+      const checkKeywordExisted = await Keywords.find({
+        keyword: {
+          $in: keywordList,
+        },
+      });
+
+      if (keywordList.length != checkKeywordExisted.length) {
+        throw new Error("The keyword that doesn't exist is here");
+      }
+
+      const response = await News.create(news);
+
+      const keywordState = news["state"];
       if (keywordState) {
         const keywordResponse = await Keywords.updateMany(
           {
@@ -206,13 +220,22 @@ router
           },
           {
             recent: true,
+          }
+        );
+
+        const keywordResponse2 = await Keywords.updateMany(
+          {
+            keyword: {
+              $in: keywordList,
+            },
+          },
+          {
             $push: {
-              news: news["_id"],
+              news: response["_id"],
             },
           }
         );
       }
-      const response = await News.create(news);
 
       res.send(response);
     } catch (e) {
@@ -227,9 +250,13 @@ router
         _id: newsId,
       });
 
+      const responseToSend = {
+        newsUpdateResponse: {},
+        keywordResponse: {},
+      };
+
       if (beforeNews === null) {
-        Error("It doesn't exist. Post it");
-        return;
+        throw new Error("It doesn't exist. Post it");
       }
 
       const newsUpdateResponse = await News.updateOne(
@@ -239,79 +266,86 @@ router
         news
       );
 
-      if (beforeNews["state"] !== news["state"]) {
-        const keywordList = news["keywords"];
-        const keywordListBefore = beforeNews["keywords"];
-        if (news["state"]) {
-          const keywordResponse = await Keywords.updateMany(
-            {
-              keyword: {
-                $in: keywordList,
-              },
+      responseToSend["newsUpdateResponse"] = newsUpdateResponse;
+
+      const keywordList = news["keywords"];
+      const keywordListBefore = beforeNews["keywords"];
+
+      const keywordResponse = {
+        responseAdd: {},
+        responseDeleted: {},
+      };
+
+      const keywordDeleted = keywordListBefore.filter((keyword) => {
+        return !keywordList.includes(keyword);
+      });
+
+      const keywordAdded = keywordList.filter((keyword) => {
+        return !keywordListBefore.includes(keyword);
+      });
+
+      const responseAdd = await Keywords.updateMany(
+        {
+          keyword: {
+            $in: keywordAdded,
+          },
+        },
+        {
+          $push: {
+            news: newsId,
+          },
+        }
+      );
+
+      const responseDeleted = await Keywords.updateMany(
+        {
+          keyword: {
+            $in: keywordDeleted,
+          },
+        },
+        {
+          $pull: {
+            news: newsId,
+          },
+        }
+      );
+
+      keywordResponse["responseAdd"] = responseAdd;
+      keywordResponse["responseDeleted"] = responseDeleted;
+
+      if (!beforeNews["state"] && news["state"]) {
+        const keywordResponse = await Keywords.updateMany(
+          {
+            keyword: {
+              $in: keywordList,
             },
-            {
-              recent: true,
-            }
-          );
+          },
+          {
+            recent: true,
+          }
+        );
+        res.send(responseToSend);
+      } else if (beforeNews["state"]) {
+        if (!news["state"]) {
+          await checkIsStilRecent(keywordListBefore);
+          res.send(responseToSend);
         } else {
-          const keywordAdded = keywordListBefore.map((keyword) => {
-            return !keywordList.includes(keyword);
-          });
-
-          const keywordDeleted = keywordList.map((keyword) => {
-            return !keywordListBefore.includes(keyword);
-          });
-
-          const responseAdd = await Keywords.updateMany(
+          const newsResponse = await Keywords.updateMany(
             {
               keyword: {
                 $in: keywordAdded,
               },
             },
             {
-              $push: {
-                news: news,
-              },
-            }
-          );
-
-          const responseDeleted = await Keywords.updateMany(
-            {
-              keyword: {
-                $in: keywordDeleted,
-              },
-            },
-            {
-              $pull: {
-                news: news,
-              },
-            }
-          );
-
-          for (let keywordBefore of keywordListBefore) {
-            const newsList = await Keywords.find({
-              keyword: keywordBefore,
-            }).select("news");
-            const newsRecent = await News.find({
-              _id: {
-                $in: newsList,
-              },
               recent: true,
-            });
-            if (newsRecent.length == 0) {
-              const response = await Keywords.updateOne(
-                {
-                  keyword: keywordBefore,
-                },
-                {
-                  state: false,
-                }
-              );
             }
-          }
+          );
+          console.log(newsResponse);
+
+          await checkIsStilRecent(keywordDeleted);
+          res.send(responseToSend);
         }
       }
-      res.send(newsUpdateResponse);
     } catch (e) {
       res.send(e);
     }
@@ -319,3 +353,38 @@ router
   .delete();
 
 export const newsRoute = router;
+
+async function checkIsStilRecent(keywordList: String[]) {
+  try {
+    for (let keyword of keywordList) {
+      const responseWithNews = await Keywords.findOne({
+        keyword: keyword,
+      }).select("news");
+
+      if (responseWithNews === null) {
+        throw new Error("none");
+      }
+
+      const newsList = responseWithNews["news"];
+
+      const newsRecent = await News.find({
+        _id: {
+          $in: newsList,
+        },
+        state: true,
+      });
+      if (newsRecent.length == 0) {
+        const response = await Keywords.updateOne(
+          {
+            keyword: keyword,
+          },
+          {
+            recent: false,
+          }
+        );
+      }
+    }
+  } catch (e) {
+    throw new Error("check is still error");
+  }
+}
