@@ -18,12 +18,18 @@ app.use(bodyParser.json());
 Connect();
 
 app.use(express.urlencoded({ extended: false })); //x-mmm? 인가 하는 거 받는거
+
+//image static service
+app.use("/images/keyword", express.static('images/keyword'));
+app.use("/images/news", express.static("images/news"));
+
+//repository router
 app.use("/news", newsRoute);
 app.use("/keywords", keywordRoute);
 app.use("/vote", voteRoute);
 
 app.use("*", (req: Request, res: Response) => {
-  res.send("asdkfklafls");
+  res.send("not existing paths");
 });
 
 app.listen(app.get("port"), () => {
