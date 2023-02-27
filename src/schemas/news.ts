@@ -43,3 +43,6 @@ const newsSchema = new Schema<NewsInf>(
 );
 
 export const News = mongoose.model<NewsInf>("News", newsSchema);
+
+
+

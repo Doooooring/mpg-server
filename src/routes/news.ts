@@ -26,7 +26,7 @@ router.route("/test").get(async (req: Request, res: Response) => {
 // 기사 목록
 router.route("/preview").get(async (req: Request, res: Response) => {
   const { curNum, keyword } = req.query;
-  if (keyword === "null") {
+  if (keyword === "") {
     try {
       const newsContents = await News.find({})
         .sort({ state: -1, order: -1 })

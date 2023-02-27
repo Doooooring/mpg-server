@@ -20,8 +20,8 @@ Connect();
 app.use(express.urlencoded({ extended: false })); //x-mmm? 인가 하는 거 받는거
 
 //image static service
-app.use("/images/keyword", express.static('images/keyword'));
-app.use("/images/news", express.static("images/news"));
+app.use("/images/keyword", express.static('src/images/keyword'));
+app.use("/images/news", express.static("src/images/news"));
 
 //repository router
 app.use("/news", newsRoute);
