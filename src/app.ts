@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 Connect();
 
-app.use(express.urlencoded({ extended: false })); //x-mmm? 인가 하는 거 받는거
+app.use(express.urlencoded({ extended: false }));
 
 //image static service
 app.use("/images/keyword", express.static('src/images/keyword'));
