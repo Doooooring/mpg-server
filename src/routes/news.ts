@@ -1,8 +1,7 @@
-import express, { Request, response, Response } from "express";
-import { RequestListener } from "http";
+import express, { Request, Response } from "express";
 import mongoose from "mongoose";
-import { VoteInf } from "../interface/vote";
 import { NewsInf } from "../interface/news";
+import { VoteInf } from "../interface/vote";
 import { Keywords } from "../schemas/keywords";
 import { News } from "../schemas/news";
 import { Vote } from "../schemas/vote";
@@ -26,6 +25,11 @@ router.route("/test").get(async (req: Request, res: Response) => {
 // 기사 목록
 router.route("/preview").get(async (req: Request, res: Response) => {
   const { curNum, keyword } = req.query;
+  if (Number(curNum) === -1) {
+    res.send("none");
+    return;
+  }
+
   if (keyword === "") {
     try {
       const newsContents = await News.find({})
@@ -157,6 +161,7 @@ router
     const { id } = req.query;
     const token = req.headers.authorization;
     const contentToSend = await News.findOne({ _id: id });
+    console.log(contentToSend);
     if (token === null) {
       res.send({
         response: null,

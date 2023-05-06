@@ -1,14 +1,10 @@
-import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
+import express, { Request, Response } from "express";
 
-import { News } from "../schemas/news";
 import { Keywords } from "../schemas/keywords";
+import { News } from "../schemas/news";
 
-import { NewsInf } from "../interface/news";
 import { KeywordInf } from "../interface/keyword";
-import { RequestListener } from "http";
-import { Console } from "console";
-import { KeywordSyntaxKind } from "typescript";
 
 const app = express();
 app.use(bodyParser.json());
@@ -98,6 +94,7 @@ router
         },
       },
     ]);
+    console.log(other);
     const response = {
       recent: recent,
       other: other,
