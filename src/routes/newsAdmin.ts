@@ -9,10 +9,8 @@ app.use(bodyParser.json());
 const router = express.Router();
 
 router.route("/newstitle").get(async (req: Request, res: Response) => {
-  console.log("is here");
   const { search } = req.query;
-  console.log(search);
-  console.log("hmm");
+
   if (search === "") {
     console.log("is nothing");
     const response = await News.find({}).select("order title");

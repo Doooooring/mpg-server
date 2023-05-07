@@ -119,7 +119,7 @@ router
       const response1 = await Keywords.create(newKeyword);
       if (news.length !== 0) {
         const response2 = await News.updateMany(
-          { order: { $in: news } },
+          { _id: { $in: news } },
           {
             $push: {
               keywords: keyword,

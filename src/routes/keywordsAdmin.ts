@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import express, { Request, Response } from "express";
 
+import { category } from "../interface/keyword";
 import { Keywords } from "../schemas/keywords";
 import { News } from "../schemas/news";
 
@@ -16,53 +17,170 @@ router.route("/keyname").get(async (req: Request, res: Response) => {
   });
   res.send(
     JSON.stringify({
-      keyword: response,
+      result: {
+        keyword: response,
+      },
     })
   );
 });
 
-router.route("/").post(async (req: Request, res: Response) => {
-  const newKeyword = req.body;
-  const { keyword, news } = newKeyword;
-  if (news === "") {
-    newKeyword["news"] = [];
-  } else {
-    newKeyword["news"] = news.split(",");
-  }
+router.route("/titles").get(async (req: Request, res: Response) => {
+  const { search } = req.query;
 
-  const checkNull = await Keywords.find({ keyword: keyword });
-  if (checkNull.length !== 0) {
-    res.send(Error("Keyword already added"));
-    return;
-  }
-  try {
-    const isRecent = await News.find({
-      order: {
-        $in: news,
+  if (search === "") {
+    const response = await Keywords.find({}).select("_id keyword");
+    res.send({
+      result: {
+        keywordList: response,
       },
-      state: true,
     });
-
-    const response1 = await Keywords.create({
-      ...newKeyword,
-      recent: isRecent.length > 0,
+  } else {
+    const response = await Keywords.find({
+      keyword: {
+        $regex: `/${search}/`,
+      },
+    }).select("_id keyword");
+    res.send({
+      result: {
+        newsList: response,
+      },
     });
-    if (news.length !== 0) {
-      const response2 = await News.updateMany(
-        { order: { $in: news } },
-        {
-          $push: {
-            keywords: keyword,
-          },
-        }
-      );
-    }
-    console.log(response1);
-    res.send(response1);
-  } catch (e) {
-    console.error("here");
-    res.send(e);
   }
 });
+
+router
+  .route("/")
+  .post(async (req: Request, res: Response) => {
+    const newKeyword = req.body;
+    const { keyword, news } = newKeyword;
+    if (typeof news === "string") {
+      if (news === "") {
+        newKeyword["news"] = [];
+      } else {
+        newKeyword["news"] = news.split(".");
+      }
+    }
+
+    const checkNull = await Keywords.find({ keyword: keyword });
+    if (checkNull.length !== 0) {
+      res.send(Error("Keyword already added"));
+      return;
+    }
+    try {
+      const isRecent = await News.find({
+        _id: {
+          $in: news,
+        },
+        state: true,
+      });
+
+      console.log(isRecent);
+
+      const response1 = await Keywords.create({
+        ...newKeyword,
+        recent: isRecent.length > 0,
+      });
+      if (news.length !== 0) {
+        const response2 = await News.updateMany(
+          { _id: { $in: news } },
+          {
+            $push: {
+              keywords: keyword,
+            },
+          }
+        );
+      }
+      console.log(response1);
+      res.send(response1);
+    } catch (e) {
+      console.error("here");
+      res.send(e);
+    }
+  })
+  .patch(async (req, res) => {
+    const {
+      keyword,
+      explain,
+      category,
+      news,
+    }: {
+      keyword: string;
+      explain: string;
+      category: category;
+      news: Array<string>;
+    } = req.body;
+    const beforeObj = await Keywords.findOne({ keyword: keyword });
+    if (!beforeObj) {
+      res.send(Error("is not existed"));
+      return;
+    }
+    try {
+      const isRecent = await News.find({
+        _id: {
+          $in: news,
+        },
+        state: true,
+      });
+
+      const response1 = await Keywords.replaceOne(
+        {
+          keyword: keyword,
+        },
+        {
+          keyword: keyword,
+          explain: explain,
+          category: category,
+          news: news,
+          recent: isRecent.length > 0,
+        }
+      );
+
+      const curNews = news;
+      const beforeNews = beforeObj["news"];
+
+      const deleteNews = beforeNews.filter((key) => {
+        return !curNews.includes(key);
+      });
+      const addNews = curNews.filter((key) => {
+        return !beforeNews.includes(key);
+      });
+
+      if (deleteNews.length !== 0) {
+        try {
+          const response = await News.updateMany(
+            { _id: { $in: deleteNews } },
+            {
+              $pull: {
+                keywords: keyword,
+              },
+            }
+          );
+        } catch (e) {
+          console.log(e);
+        }
+      }
+
+      if (addNews.length !== 0) {
+        try {
+          const response = await News.updateMany(
+            {
+              _id: { $in: addNews },
+            },
+            {
+              $push: {
+                keywords: keyword,
+              },
+            }
+          );
+        } catch (e) {
+          console.log(e);
+        }
+      }
+
+      res.send(response1);
+    } catch {
+      res.send(Error("get some error"));
+    }
+  });
 
 export const keywordAdminRoute = router;

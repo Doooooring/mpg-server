@@ -60,7 +60,7 @@ app.use(
 app.use("/news", newsRoute);
 app.use("/keywords", keywordRoute);
 app.use("/admin/news", newsAdminRoute);
-app.use("/admin/keywords", keywordAdminRoute);
+app.use("/admin/keyword", keywordAdminRoute);
 app.use("/vote", voteRoute);
 
 app.use("*", (req: Request, res: Response) => {
