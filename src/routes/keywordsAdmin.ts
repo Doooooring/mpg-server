@@ -99,11 +99,13 @@ router
   })
   .patch(async (req, res) => {
     const {
+      _id,
       keyword,
       explain,
       category,
       news,
     }: {
+      _id: string;
       keyword: string;
       explain: string;
       category: category;
@@ -122,9 +124,9 @@ router
         state: true,
       });
 
-      const response1 = await Keywords.replaceOne(
+      const response1 = await Keywords.updateOne(
         {
-          keyword: keyword,
+          _id: _id,
         },
         {
           keyword: keyword,
