@@ -33,4 +33,17 @@ router.route("/newstitle").get(async (req: Request, res: Response) => {
   }
 });
 
+router.route("/id").get(async (req: Request, res: Response) => {
+  const { id } = req.query;
+
+  const response = await News.findOne({
+    _id: id,
+  }).select("title summary news journals state opinions keywords");
+  res.send({
+    result: {
+      news: response,
+    },
+  });
+});
+
 export const newsAdminRoute = router;
