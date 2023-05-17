@@ -51,7 +51,7 @@ router.route("/titles").get(async (req: Request, res: Response) => {
 router
   .route("/")
   .post(async (req: Request, res: Response) => {
-    const newKeyword = req.body;
+    const newKeyword = req.body.keyword;
     const { keyword, news } = newKeyword;
     if (typeof news === "string") {
       if (news === "") {
@@ -110,8 +110,9 @@ router
       explain: string;
       category: category;
       news: Array<string>;
-    } = req.body;
-    const beforeObj = await Keywords.findOne({ keyword: keyword });
+    } = req.body.keyword;
+    console.log("is here");
+    const beforeObj = await Keywords.findOne({ _id: _id });
     if (!beforeObj) {
       res.send(Error("is not existed"));
       return;
@@ -123,7 +124,8 @@ router
         },
         state: true,
       });
-
+      console.log("is recent");
+      console.log(isRecent);
       const response1 = await Keywords.updateOne(
         {
           _id: _id,
@@ -146,7 +148,9 @@ router
       const addNews = curNews.filter((key) => {
         return !beforeNews.includes(key);
       });
-
+      console.log("is changed");
+      console.log(beforeNews);
+      console.log(deleteNews);
       if (deleteNews.length !== 0) {
         try {
           const response = await News.updateMany(
@@ -157,6 +161,7 @@ router
               },
             }
           );
+          console.log(response);
         } catch (e) {
           console.log(e);
         }
@@ -180,7 +185,8 @@ router
       }
 
       res.send(response1);
-    } catch {
+    } catch (e) {
+      console.log(e);
       res.send(Error("get some error"));
     }
   });
