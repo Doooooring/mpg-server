@@ -354,8 +354,7 @@ router
     } catch (e) {
       res.send(e);
     }
-  })
-  .delete();
+  });
 
 export const newsRoute = router;
 

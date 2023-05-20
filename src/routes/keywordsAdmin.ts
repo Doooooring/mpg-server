@@ -189,6 +189,48 @@ router
       console.log(e);
       res.send(Error("get some error"));
     }
+  })
+  .delete(async (req, res) => {
+    try {
+      const { id } = req.query;
+      const deleteKeyword = await Keywords.findOne({
+        _id: id,
+      });
+      const keyword = deleteKeyword!["keyword"];
+      const deleteNews = deleteKeyword!["news"];
+
+      const response = await Keywords.deleteOne({
+        id: id,
+      });
+
+      if (deleteNews.length !== 0) {
+        try {
+          const response = await News.updateMany(
+            { _id: { $in: deleteNews } },
+            {
+              $pull: {
+                keywords: keyword,
+              },
+            }
+          );
+          console.log(response);
+        } catch (e) {
+          console.log(e);
+        }
+      }
+
+      res.send({
+        result: {
+          state: true,
+        },
+      });
+    } catch {
+      res.send({
+        result: {
+          state: false,
+        },
+      });
+    }
   });
 
 export const keywordAdminRoute = router;

@@ -11,6 +11,11 @@ app.use(bodyParser.json());
 
 const router = express.Router();
 
+router.route("/kmj/deleteAll").delete(async (req: Request, res: Response) => {
+  const response = await News.deleteMany({});
+  return;
+});
+
 router.route("/newstitle").get(async (req: Request, res: Response) => {
   console.log(req.query);
   const search = (req.query.search as string).trim();
@@ -223,6 +228,53 @@ router
     } catch (e) {
       console.log(e);
       res.send(e);
+    }
+  })
+  .delete(async (req, res) => {
+    try {
+      const { id } = req.query;
+
+      const curNews = await News.findOne({
+        _id: id,
+      });
+
+      if (curNews === null) {
+        res.send(Error);
+        return;
+      }
+
+      const curKeywords = curNews!["keywords"];
+
+      const response = await News.deleteOne({
+        _id: id,
+      });
+
+      const responseDeleted = await Keywords.updateMany(
+        {
+          keyword: {
+            $in: curKeywords,
+          },
+        },
+        {
+          $pull: {
+            news: id,
+          },
+        }
+      );
+
+      await checkIsStilRecent(curKeywords);
+
+      res.send({
+        result: {
+          state: true,
+        },
+      });
+    } catch {
+      res.send({
+        result: {
+          state: false,
+        },
+      });
     }
   });
 
