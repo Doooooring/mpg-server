@@ -11,10 +11,12 @@ app.use(bodyParser.json());
 
 const router = express.Router();
 
-router.route("/kmj/deleteAll").delete(async (req: Request, res: Response) => {
-  const response = await News.deleteMany({});
-  return;
-});
+router
+  .route("/kmj123/deleteAll")
+  .delete(async (req: Request, res: Response) => {
+    const response = await News.deleteMany({});
+    return;
+  });
 
 router.route("/newstitle").get(async (req: Request, res: Response) => {
   console.log(req.query);
