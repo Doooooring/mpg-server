@@ -10,7 +10,12 @@ import { updateKeywordsState } from "../keywordController";
 export const getNewsPreviewList = async (req: Request, res: Response) => {
   const { page, keyword } = req.query;
   if (Number(page) === -1) {
-    res.send("none");
+    res.send({
+      success: false,
+      result: {
+        news: [],
+      },
+    });
     return;
   }
   if (keyword === "") {
@@ -20,9 +25,19 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
         .select("order title summary keywords state")
         .skip(Number(page) * 20)
         .limit(20);
-      res.send(JSON.stringify(newsContents));
+      res.send({
+        success: true,
+        result: {
+          news: newsContents,
+        },
+      });
     } catch (err) {
-      res.send(err);
+      res.send({
+        success: false,
+        result: {
+          news: [],
+        },
+      });
       console.log(err);
     }
   } else {
@@ -31,7 +46,12 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
         keyword: keyword,
       }).select("news");
       if (response === null) {
-        res.send("Nothings");
+        res.send({
+          success: false,
+          result: {
+            news: [],
+          },
+        });
         return;
       }
       const { news } = response;
@@ -42,9 +62,19 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
         .select("order title summary keywords state")
         .skip(Number(page))
         .limit(20);
-      res.send(JSON.stringify(newsContents));
+      res.send({
+        success: true,
+        result: {
+          news: newsContents,
+        },
+      });
     } catch (err) {
-      res.send(err);
+      res.send({
+        success: false,
+        result: {
+          news: [],
+        },
+      });
       console.log(err);
     }
   }
@@ -52,36 +82,56 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
 
 export const getNewsById = async (req: Request, res: Response) => {
   const { id } = req.params;
-
-  const response = await News.findOne({
-    _id: id,
-  }).select("title summary news journals state opinions keywords");
-  res.send({
-    result: {
-      news: response,
-    },
-  });
+  try {
+    const response = await News.findOne({
+      _id: id,
+    }).select("title summary news journals state opinions keywords");
+    res.send({
+      success: true,
+      result: {
+        news: response,
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      result: {
+        news: null,
+      },
+    });
+  }
 };
 
 export const getNewsTitle = async (req: Request, res: Response) => {
   const search = (req.query.search as string).trim();
-
-  if (search === "") {
-    const response = await News.find({}).select("order title");
+  try {
+    if (search === "") {
+      const response = await News.find({}).select("order title");
+      res.send({
+        success: true,
+        result: {
+          news: response,
+        },
+      });
+    } else {
+      const response = await News.find({
+        title: {
+          $regex: `${search}`,
+        },
+      }).select("order title");
+      res.send({
+        success: true,
+        result: {
+          news: response,
+        },
+      });
+    }
+  } catch (e) {
     res.send({
+      success: false,
       result: {
-        newsList: response,
-      },
-    });
-  } else {
-    const response = await News.find({
-      title: {
-        $regex: `${search}`,
-      },
-    }).select("order title");
-    res.send({
-      result: {
-        newsList: response,
+        news: [],
       },
     });
   }
@@ -94,15 +144,18 @@ export const getNewsByIdWithVote = async (req: Request, res: Response) => {
   console.log(contentToSend);
   if (token === null) {
     res.send({
-      response: null,
-      news: contentToSend,
+      success: true,
+      result: { response: null, news: contentToSend },
     });
   } else {
     const user: VoteInf | null = await Vote.findOne({ user: token });
     if (user === null) {
       res.send({
-        response: null,
-        news: contentToSend,
+        success: true,
+        result: {
+          response: null,
+          news: contentToSend,
+        },
       });
     } else {
       const userVote = user.vote;
@@ -112,8 +165,11 @@ export const getNewsByIdWithVote = async (req: Request, res: Response) => {
 
       const response = curNews.length !== 0 ? curNews[0].response : null;
       res.send({
-        response: response,
-        news: contentToSend,
+        success: true,
+        result: {
+          response: response,
+          news: contentToSend,
+        },
       });
     }
   }
@@ -125,9 +181,19 @@ export const getNewsByKeyword = async (req: Request, res: Response) => {
     const keywordData = await Keywords.findOne({ keyword: keyword });
     const NewsList = keywordData?.news;
     const response = await News.find({ _id: { $in: NewsList } });
-    res.send(response);
+    res.send({
+      success: true,
+      result: {
+        news: response,
+      },
+    });
   } catch {
-    res.send("no");
+    res.send({
+      success: false,
+      result: {
+        news: [],
+      },
+    });
   }
 };
 
@@ -153,12 +219,21 @@ export const setKeywordsById = async (req: Request, res: Response) => {
       }
     );
     res.send({
-      news: response1,
-      keywords: response2,
+      success: true,
+      result: {
+        news: response1,
+        keywords: response2,
+      },
     });
   } catch (e) {
     console.error(e);
-    res.send("Not good ");
+    res.send({
+      success: false,
+      result: {
+        news: [],
+        keywords: [],
+      },
+    });
   }
 };
 
@@ -199,10 +274,16 @@ export const updateKeywordsById = async (req: Request, res: Response) => {
           },
         }
       );
-      res.send(true);
+      res.send({
+        success: true,
+        result: {},
+      });
     }
   } catch (e) {
-    res.send(e);
+    res.send({
+      success: false,
+      result: {},
+    });
     console.error(e);
   }
 };
@@ -224,11 +305,14 @@ export const getNewsComment = async (req: Request, res: Response) => {
     );
     res.send({
       success: true,
-      result: comments,
+      result: { comments },
     });
   } catch (e) {
     console.log(e);
-    res.send(e);
+    res.send({
+      success: false,
+      result: {},
+    });
   }
 };
 
@@ -287,14 +371,15 @@ export const addNewsData = async (req: Request, res: Response) => {
     }
 
     res.send({
-      status: true,
-      result: {
-        state: true,
-      },
+      success: true,
+      result: {},
     });
   } catch (e) {
     console.log(e);
-    res.send("Keyword Post Error");
+    res.send({
+      success: false,
+      result: {},
+    });
   }
 };
 
@@ -380,7 +465,11 @@ export const updateNewsData = async (req: Request, res: Response) => {
           recent: true,
         }
       );
-      res.send(responseToSend);
+      // res.send(responseToSend);
+      res.send({
+        success: true,
+        result: {},
+      });
     } else if (beforeNews["state"]) {
       if (!news["state"]) {
         await updateKeywordsState(keywordListBefore);
@@ -396,14 +485,23 @@ export const updateNewsData = async (req: Request, res: Response) => {
             recent: true,
           }
         );
-        console.log(newsResponse);
+        // console.log(newsResponse);
 
         await updateKeywordsState(keywordDeleted);
-        res.send(responseToSend);
+        // res.send(responseToSend);
+        res.send({
+          success: true,
+          result: {},
+        });
       }
     }
   } catch (e) {
-    res.send(e);
+    // res.send(e);
+    console.log(e);
+    res.send({
+      success: false,
+      result: {},
+    });
   }
 };
 
@@ -416,7 +514,11 @@ export const deleteNewsData = async (req: Request, res: Response) => {
     });
 
     if (curNews === null) {
-      res.send(Error);
+      Error("news not exist");
+      res.send({
+        success: false,
+        result: {},
+      });
       return;
     }
 
@@ -442,20 +544,29 @@ export const deleteNewsData = async (req: Request, res: Response) => {
     await updateKeywordsState(curKeywords);
 
     res.send({
-      result: {
-        state: true,
-      },
+      success: true,
+      result: {},
     });
   } catch {
     res.send({
-      result: {
-        state: false,
-      },
+      success: false,
+      result: {},
     });
   }
 };
 
 export const deleteNewsAll = async (req: Request, res: Response) => {
-  const response = await News.deleteMany({});
-  return;
+  try {
+    const response = await News.deleteMany({});
+    res.send({
+      success: true,
+      result: {},
+    });
+    return;
+  } catch (e) {
+    res.send({
+      success: false,
+      result: {},
+    });
+  }
 };

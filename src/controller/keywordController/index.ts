@@ -10,90 +10,127 @@ export const deleteKeywordAll = async (req: Request, res: Response) => {
 
 export const getKeywords = async (req: Request, res: Response) => {
   const { search } = req.query;
-
-  if (search === "" || search === undefined || search === null) {
-    const response = await Keywords.find({}).select("_id keyword");
+  try {
+    if (search === "" || search === undefined || search === null) {
+      const response = await Keywords.find({}).select("_id keyword");
+      res.send({
+        result: {
+          keywordList: response,
+        },
+      });
+    } else {
+      const response = await Keywords.find({
+        keyword: {
+          $regex: `/${search}/`,
+        },
+      }).select("_id keyword");
+      res.send({
+        success: true,
+        result: {
+          keywords: response,
+        },
+      });
+    }
+  } catch (e) {
+    console.log(e);
     res.send({
-      result: {
-        keywordList: response,
-      },
-    });
-  } else {
-    const response = await Keywords.find({
-      keyword: {
-        $regex: `/${search}/`,
-      },
-    }).select("_id keyword");
-    res.send({
-      result: {
-        keywordList: response,
-      },
+      success: false,
+      result: {},
     });
   }
 };
 
 export const getKeywordInfoByKeyword = async (req: Request, res: Response) => {
   const { keyword } = req.params;
-  const response = await Keywords.findOne({
-    keyword: keyword,
-  });
-  res.send(
-    JSON.stringify({
+  try {
+    const response = await Keywords.findOne({
+      keyword: keyword,
+    });
+    res.send({
+      success: true,
       result: {
         keyword: response,
       },
-    })
-  );
+    });
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      result: {},
+    });
+  }
 };
 
 export const getKeywordsByCategory = async (req: Request, res: Response) => {
-  const { category } = req.params;
-  const { page } = req.query;
-  const response = await Keywords.find({ category: category })
-    .skip(Number(page))
-    .limit(20);
-  res.send({
-    status: true,
-    result: {
-      keywords: response,
-    },
-  });
+  try {
+    const { category } = req.params;
+    const { page } = req.query;
+    const response = await Keywords.find({ category: category })
+      .select("keyword category recent")
+      .skip(Number(page))
+      .limit(20);
+    res.send({
+      success: true,
+      result: {
+        keywords: response,
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      result: {},
+    });
+  }
 };
 
 export const getKeywordsForCategories = async (req: Request, res: Response) => {
-  const recent = await Keywords.find({ recent: true })
-    .select("keyword category recent")
-    .limit(10);
-  const other = await Keywords.aggregate([
-    {
-      $group: {
-        _id: "$category",
-        keywords: {
-          $topN: {
-            n: 80,
-            sortBy: { keyword: -1 },
-            output: {
-              _id: "$_id",
-              keyword: "$keyword",
-              category: "$category",
-              recent: "$recent",
+  try {
+    const recent = await Keywords.find({ recent: true })
+      .select("keyword category recent")
+      .limit(10);
+    const other = await Keywords.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          keywords: {
+            $topN: {
+              n: 80,
+              sortBy: { keyword: -1 },
+              output: {
+                _id: "$_id",
+                keyword: "$keyword",
+                category: "$category",
+                recent: "$recent",
+              },
             },
           },
         },
       },
-    },
-  ]);
-  console.log(other);
-  const response = {
-    recent: recent,
-    other: other,
-  };
-  res.send(JSON.stringify(response));
+    ]);
+
+    const response = {
+      recent: recent,
+      other: other,
+    };
+    res.send({
+      success: true,
+      result: {
+        keywords: response,
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      result: {},
+    });
+  }
 };
 
 export const getKeywordWithNewsData = async (req: Request, res: Response) => {
-  const { curNum, keyName } = req.query;
-  const keyword = await Keywords.findOne({ keyword: keyName }).select(
+  const { page, keyword: keyname } = req.query;
+  const keyword = await Keywords.findOne({ keyword: keyname }).select(
     "keyword explain news"
   );
   if (keyword === null) {
@@ -108,7 +145,7 @@ export const getKeywordWithNewsData = async (req: Request, res: Response) => {
   })
     .sort({ state: -1, order: -1 })
     .select("order title summary keywords state")
-    .skip(Number(curNum))
+    .skip(Number(page))
     .limit(20);
   const response = {
     keyword: keyword,
