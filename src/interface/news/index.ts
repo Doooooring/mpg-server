@@ -21,14 +21,16 @@ export interface NewsInf {
   order: number;
   title: string;
   summary: string;
-  news: Array<{ date: Date; title: string; link: string }>;
-  journals: Array<{ press: string; title: string; link: string }>;
   keywords: Array<string>;
   state: Boolean;
   opinions: {
     left: string;
     right: string;
   };
+  timeline: Array<{
+    date: string;
+    title: string;
+  }>;
   comments: {
     [key in commentType]: Array<{
       title: string;

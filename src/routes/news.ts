@@ -18,7 +18,6 @@ router.route("/test").get(async (req: Request, res: Response) => {
   const response = await News.findOne({
     "journals.press": "조선",
   }).select("journals.press");
-  console.log(response);
   res.send(response);
 });
 
