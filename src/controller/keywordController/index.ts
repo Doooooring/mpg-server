@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { category } from "../../interface/keyword";
 import { Keywords } from "../../schemas/keywords";
 import { News } from "../../schemas/news";
+import { keywordRepositories } from "../../service/keyword";
+import { newsRepositories } from "../../service/news";
 
 export const deleteKeywordAll = async (req: Request, res: Response) => {
   const response = await Keywords.deleteMany({});
@@ -10,27 +12,18 @@ export const deleteKeywordAll = async (req: Request, res: Response) => {
 
 export const getKeywords = async (req: Request, res: Response) => {
   const { search } = req.query;
+  let v =
+    search === "" || search === undefined || search === null
+      ? ""
+      : (search as string);
   try {
-    if (search === "" || search === undefined || search === null) {
-      const response = await Keywords.find({}).select("_id keyword");
-      res.send({
-        result: {
-          keywordList: response,
-        },
-      });
-    } else {
-      const response = await Keywords.find({
-        keyword: {
-          $regex: `/${search}/`,
-        },
-      }).select("_id keyword");
-      res.send({
-        success: true,
-        result: {
-          keywords: response,
-        },
-      });
-    }
+    const response = await keywordRepositories.getKeywordTitlesInShort(v);
+    res.send({
+      success: true,
+      result: {
+        keywords: response,
+      },
+    });
   } catch (e) {
     console.log(e);
     res.send({
@@ -43,9 +36,7 @@ export const getKeywords = async (req: Request, res: Response) => {
 export const getKeywordInfoByKeyword = async (req: Request, res: Response) => {
   const { keyword } = req.params;
   try {
-    const response = await Keywords.findOne({
-      keyword: keyword,
-    });
+    const response = await keywordRepositories.getKeywordByKey(keyword);
     res.send({
       success: true,
       result: {
@@ -65,10 +56,11 @@ export const getKeywordsByCategory = async (req: Request, res: Response) => {
   try {
     const { category } = req.params;
     const { page } = req.query;
-    const response = await Keywords.find({ category: category })
-      .select("keyword category recent")
-      .skip(Number(page))
-      .limit(20);
+    const response = await keywordRepositories.getKeywordsInShortByCategory(
+      category,
+      Number(page),
+      20
+    );
     res.send({
       success: true,
       result: {
@@ -86,28 +78,10 @@ export const getKeywordsByCategory = async (req: Request, res: Response) => {
 
 export const getKeywordsForCategories = async (req: Request, res: Response) => {
   try {
-    const recent = await Keywords.find({ recent: true })
-      .select("keyword category recent")
-      .limit(10);
-    const other = await Keywords.aggregate([
-      {
-        $group: {
-          _id: "$category",
-          keywords: {
-            $topN: {
-              n: 80,
-              sortBy: { keyword: -1 },
-              output: {
-                _id: "$_id",
-                keyword: "$keyword",
-                category: "$category",
-                recent: "$recent",
-              },
-            },
-          },
-        },
-      },
-    ]);
+    const recent = await keywordRepositories.getKeywordByState(true, 10);
+    const other = await keywordRepositories.getKeywordsInShortWithEachCateogory(
+      80
+    );
 
     const response = {
       recent: recent,
@@ -130,23 +104,16 @@ export const getKeywordsForCategories = async (req: Request, res: Response) => {
 
 export const getKeywordWithNewsData = async (req: Request, res: Response) => {
   const { page, keyword: keyname } = req.query;
-  const keyword = await Keywords.findOne({ keyword: keyname }).select(
-    "keyword explain news"
+  const keyword = await keywordRepositories.getKeywordsWithNews(
+    keyname as string
   );
+
   if (keyword === null) {
     res.send("none");
     return;
   }
   const { news } = keyword;
-  const previews = await News.find({
-    _id: {
-      $in: news,
-    },
-  })
-    .sort({ state: -1, order: -1 })
-    .select("order title summary keywords state")
-    .skip(Number(page))
-    .limit(20);
+  const previews = await newsRepositories.getNewsInShort(Number(page), 20);
   const response = {
     keyword: keyword,
     previews: previews,
@@ -165,34 +132,21 @@ export const addKeyword = async (req: Request, res: Response) => {
     }
   }
 
-  const checkNull = await Keywords.find({ keyword: keyword });
-  if (checkNull.length !== 0) {
+  const checkNull = await keywordRepositories.getKeywordByKey(keyword);
+  if (checkNull !== null) {
     res.send(Error("Keyword already added"));
     return;
   }
   try {
-    const isRecent = await News.find({
-      _id: {
-        $in: news,
-      },
-      state: true,
-    });
+    const isRecent = await newsRepositories.getNewsByIdAndState(news, true);
 
-    console.log(isRecent);
-
-    const response1 = await Keywords.create({
+    const response1 = await keywordRepositories.postKeyword({
       ...newKeyword,
       recent: isRecent.length > 0,
     });
+
     if (news.length !== 0) {
-      const response2 = await News.updateMany(
-        { _id: { $in: news } },
-        {
-          $push: {
-            keywords: keyword,
-          },
-        }
-      );
+      const response2 = await newsRepositories.pushKeywordToNews(news, keyword);
     }
     console.log(response1);
     res.send(response1);
@@ -217,31 +171,24 @@ export const updateKeyword = async (req: Request, res: Response) => {
     news: Array<string>;
   } = req.body.keyword;
 
-  const beforeObj = await Keywords.findOne({ _id: _id });
+  const beforeObj = await keywordRepositories.getKeywordById(_id);
+
   if (!beforeObj) {
     res.send(Error("is not existed"));
     return;
   }
   try {
-    const isRecent = await News.find({
-      _id: {
-        $in: news,
-      },
-      state: true,
-    });
-    console.log("is recent");
-    console.log(isRecent);
-    const response1 = await Keywords.updateOne(
-      {
-        _id: _id,
-      },
-      {
-        keyword: keyword,
-        explain: explain,
-        category: category,
-        news: news,
-        recent: isRecent.length > 0,
-      }
+    const isRecent = await newsRepositories.getNewsByIdAndState(news, true);
+    const keywordToPut = {
+      keyword: keyword,
+      explain: explain,
+      category: category,
+      news: news,
+      recent: isRecent.length > 0,
+    };
+    const response1 = await keywordRepositories.updateKeywordById(
+      _id,
+      keywordToPut
     );
 
     const curNews = news;
@@ -253,19 +200,13 @@ export const updateKeyword = async (req: Request, res: Response) => {
     const addNews = curNews.filter((key) => {
       return !beforeNews.includes(key);
     });
-    console.log("is changed");
-    console.log(beforeNews);
-    console.log(deleteNews);
     if (deleteNews.length !== 0) {
       try {
-        const response = await News.updateMany(
-          { _id: { $in: deleteNews } },
-          {
-            $pull: {
-              keywords: keyword,
-            },
-          }
+        const response = await newsRepositories.pullKeywordFromNews(
+          deleteNews,
+          keyword
         );
+
         console.log(response);
       } catch (e) {
         console.log(e);
@@ -274,15 +215,9 @@ export const updateKeyword = async (req: Request, res: Response) => {
 
     if (addNews.length !== 0) {
       try {
-        const response = await News.updateMany(
-          {
-            _id: { $in: addNews },
-          },
-          {
-            $push: {
-              keywords: keyword,
-            },
-          }
+        const response = await newsRepositories.pushKeywordToNews(
+          addNews,
+          keyword
         );
       } catch (e) {
         console.log(e);
@@ -299,26 +234,21 @@ export const updateKeyword = async (req: Request, res: Response) => {
 export const deleteKeyword = async (req: Request, res: Response) => {
   try {
     const { id } = req.query;
-    const deleteKeyword = await Keywords.findOne({
-      _id: id,
-    });
+    const deleteKeyword = await keywordRepositories.getKeywordById(
+      id as string
+    );
     const keyword = deleteKeyword!["keyword"];
     const deleteNews = deleteKeyword!["news"];
 
-    const response = await Keywords.deleteOne({
-      id: id,
-    });
+    const response = await keywordRepositories.deleteKeywordById(id as string);
 
     if (deleteNews.length !== 0) {
       try {
-        const response = await News.updateMany(
-          { _id: { $in: deleteNews } },
-          {
-            $pull: {
-              keywords: keyword,
-            },
-          }
+        const response = await newsRepositories.pullKeywordFromNews(
+          deleteNews,
+          keyword
         );
+
         console.log(response);
       } catch (e) {
         console.log(e);
@@ -355,9 +285,7 @@ export const updateKeywordsState = async (keywords: string[]) => {
 };
 
 export const updateKeywordState = async (keyword: string) => {
-  const responseWithNews = await Keywords.findOne({
-    keyword: keyword,
-  }).select("news");
+  const responseWithNews = await keywordRepositories.getKeywordByKey(keyword);
 
   if (responseWithNews === null) {
     throw new Error("none");
@@ -372,13 +300,9 @@ export const updateKeywordState = async (keyword: string) => {
     state: true,
   });
   if (newsRecent.length == 0) {
-    const response = await Keywords.updateOne(
-      {
-        keyword: keyword,
-      },
-      {
-        recent: false,
-      }
+    const response = await keywordRepositories.updateKeywordsState(
+      [keyword],
+      false
     );
   }
 };

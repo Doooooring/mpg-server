@@ -21,7 +21,10 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
   }
   if (keyword === "") {
     try {
-      const newsContents = await newsRepositories.getNewsInShort(Number(page));
+      const newsContents = await newsRepositories.getNewsInShort(
+        Number(page) * 20,
+        20
+      );
       res.send({
         success: true,
         result: {
@@ -54,7 +57,8 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
       const { news } = response;
       const newsContents = await newsRepositories.getNewsInShortByIdList(
         Number(page),
-        news
+        news,
+        20
       );
       res.send({
         success: true,
@@ -165,7 +169,7 @@ export const getNewsByIdWithVote = async (req: Request, res: Response) => {
 export const getNewsByKeyword = async (req: Request, res: Response) => {
   const { keyword } = req.params;
   try {
-    const keywordData = await keywordRepositories.getKeyword(keyword);
+    const keywordData = await keywordRepositories.getKeywordByKey(keyword);
     const newsList = keywordData?.news;
     const response = await newsRepositories.getNewsByIdList(newsList!);
     res.send({

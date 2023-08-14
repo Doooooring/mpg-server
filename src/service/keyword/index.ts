@@ -1,3 +1,4 @@
+import { KeywordInf } from "../../interface/keyword";
 import { Keywords } from "../../schemas/keywords";
 
 class KeywordRepositories {
@@ -7,12 +8,91 @@ class KeywordRepositories {
     }).select("news");
   };
 
-  getKeyword = async (keyword: string) => {
+  getKeywordByKey = async (keyword: string) => {
     return Keywords.findOne({ keyword: keyword });
+  };
+
+  getKeywordById = async (id: string) => {
+    return Keywords.findOne({
+      _id: id,
+    });
   };
 
   getKeywords = async (keywords: string[]) => {
     return Keywords.find({ keyword: { $in: keywords } });
+  };
+
+  getKeywordsWithNews = async (keyword: string) => {
+    return Keywords.findOne({ keyword: keyword }).select(
+      "keyword explain news"
+    );
+  };
+
+  getKeywordTitlesInShort = async (search: string) => {
+    const query =
+      search === ""
+        ? {}
+        : {
+            keyword: {
+              $regex: `/${search}/`,
+            },
+          };
+
+    return Keywords.find(query).select("_id keyword");
+  };
+
+  getKeywordsInShortByCategory = async (
+    category: string,
+    page: number,
+    limit: number
+  ) => {
+    return Keywords.find({ category: category })
+      .select("keyword category recent")
+      .skip(page)
+      .limit(limit);
+  };
+
+  getKeywordByState = async (state: boolean, page: number) => {
+    return Keywords.find({ recent: state })
+      .select("keyword category recent")
+      .limit(page);
+  };
+
+  getKeywordsInShortWithEachCateogory = async (page: number) => {
+    return Keywords.aggregate([
+      {
+        $group: {
+          _id: "$category",
+          keywords: {
+            $topN: {
+              n: page,
+              sortBy: { keyword: -1 },
+              output: {
+                _id: "$_id",
+                keyword: "$keyword",
+                category: "$category",
+                recent: "$recent",
+              },
+            },
+          },
+        },
+      },
+    ]);
+  };
+
+  postKeyword = async (keyword: any) => {
+    return Keywords.create({
+      keyword,
+    });
+  };
+
+  updateKeywordById = async (id: string, keyword: KeywordInf) => {
+    return Keywords.updateOne(
+      {
+        _id: id,
+      },
+      keyword
+    );
   };
 
   updateKeywordsState = async (keywords: string[], state: boolean) => {
@@ -48,6 +128,12 @@ class KeywordRepositories {
         },
       }
     );
+  };
+
+  deleteKeywordById = async (id: string) => {
+    return Keywords.deleteOne({
+      id: id,
+    });
   };
 
   pullNewsInfoToKeywords = async (keywords: string[], news: string) => {

@@ -6,22 +6,26 @@ class NewsRepositories {
     return News.estimatedDocumentCount();
   };
 
-  getNewsInShortByIdList = async (page: number, news: string[]) => {
+  getNewsInShortByIdList = async (
+    page: number,
+    news: string[],
+    limit: number
+  ) => {
     return News.find({
       _id: { $in: news },
     })
       .sort({ state: -1, order: -1 })
       .select("order title summary keywords state")
-      .skip(Number(page))
-      .limit(20);
+      .skip(page)
+      .limit(limit);
   };
 
-  getNewsInShort = async (page: number) => {
+  getNewsInShort = async (page: number, limit: number) => {
     return News.find({})
       .sort({ state: -1, order: -1 })
       .select("order title summary keywords state")
-      .skip(page * 20)
-      .limit(20);
+      .skip(page)
+      .limit(limit);
   };
 
   getNewsByIdList = async (news: Array<string>) => {
@@ -34,6 +38,15 @@ class NewsRepositories {
     });
   };
 
+  getNewsByIdAndState = async (news: string[], state: boolean) => {
+    return News.find({
+      _id: {
+        $in: news,
+      },
+      state: state,
+    });
+  };
+
   getNewsByIdWithoutVote = async (id: string) => {
     return News.findOne({
       _id: id,
@@ -41,11 +54,15 @@ class NewsRepositories {
   };
 
   getNewsTitle = async (title: string) => {
-    return News.find({
-      title: {
-        $regex: `${title}`,
-      },
-    }).select("order title");
+    const query =
+      title === ""
+        ? {}
+        : {
+            title: {
+              $regex: `${title}`,
+            },
+          };
+    return News.find(query).select("order title");
   };
 
   getCommentsById = async (id: string) => {
@@ -74,11 +91,31 @@ class NewsRepositories {
     );
   };
 
-  deleteNewsById = async (id : string) => {
+  deleteNewsById = async (id: string) => {
     return News.deleteOne({
-        _id: id,
-      });
-  
+      _id: id,
+    });
+  };
+
+  pushKeywordToNews = async (news: string[], keyword: string) => {
+    return News.updateMany(
+      { _id: { $in: news } },
+      {
+        $push: {
+          keywords: keyword,
+        },
+      }
+    );
+  };
+  pullKeywordFromNews = async (news :string[], keyword: string) => {
+    return News.updateMany(
+        { _id: { $in: news } },
+        {
+          $pull: {
+            keywords: keyword,
+          },
+        }
+      );
   }
 }
 
