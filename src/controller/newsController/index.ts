@@ -334,12 +334,10 @@ export const addNewsData = async (req: Request, res: Response) => {
 };
 
 export const updateNewsData = async (req: Request, res: Response) => {
-  const news: NewsInf = req.body;
-  const newsId = news["_id"];
+  const news = req.body.news;
+  const newsId = news["_id"] as string;
   try {
-    const beforeNews = await newsRepositories.getNewsById(
-      JSON.stringify(newsId)
-    );
+    const beforeNews = await newsRepositories.getNewsById(newsId as string);
 
     const responseToSend = {
       newsUpdateResponse: {},
@@ -351,7 +349,7 @@ export const updateNewsData = async (req: Request, res: Response) => {
     }
 
     const newsUpdateResponse = await newsRepositories.updateNewsById(
-      JSON.stringify(newsId),
+      newsId,
       news
     );
 
@@ -369,9 +367,11 @@ export const updateNewsData = async (req: Request, res: Response) => {
       return !keywordList.includes(keyword);
     });
 
-    const keywordAdded = keywordList.filter((keyword) => {
-      return !keywordListBefore.includes(keyword);
-    });
+    const keywordAdded = (keywordList as NewsInf["keywords"]).filter(
+      (keyword) => {
+        return !keywordListBefore.includes(keyword);
+      }
+    );
 
     const responseAdd = await keywordRepositories.pushNewsInfoToKeywords(
       keywordAdded,

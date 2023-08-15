@@ -1,5 +1,7 @@
+import mongoose from "mongoose";
 import { KeywordInf } from "../../interface/keyword";
 import { Keywords } from "../../schemas/keywords";
+const ObjectId = mongoose.Types.ObjectId;
 
 class KeywordRepositories {
   getNewsInKeyword = async (keyword: string) => {
@@ -13,8 +15,9 @@ class KeywordRepositories {
   };
 
   getKeywordById = async (id: string) => {
+    const _id = new ObjectId(id);
     return Keywords.findOne({
-      _id: id,
+      _id: _id,
     });
   };
 
@@ -87,9 +90,10 @@ class KeywordRepositories {
   };
 
   updateKeywordById = async (id: string, keyword: KeywordInf) => {
+    const _id = new ObjectId(id);
     return Keywords.updateOne(
       {
-        _id: id,
+        _id: _id,
       },
       keyword
     );
@@ -131,8 +135,9 @@ class KeywordRepositories {
   };
 
   deleteKeywordById = async (id: string) => {
+    const _id = new ObjectId(id);
     return Keywords.deleteOne({
-      id: id,
+      _id: _id,
     });
   };
 

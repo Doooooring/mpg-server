@@ -1,5 +1,7 @@
+import mongoose from "mongoose";
 import { NewsInf } from "../../interface/news";
 import { News } from "../../schemas/news";
+const ObjectId = mongoose.Types.ObjectId;
 
 class NewsRepositories {
   getNewsCount = async () => {
@@ -11,8 +13,12 @@ class NewsRepositories {
     news: string[],
     limit: number
   ) => {
+    const newsIdList = news.map((id) => {
+      const _id = new ObjectId(id);
+      return _id;
+    });
     return News.find({
-      _id: { $in: news },
+      _id: { $in: newsIdList },
     })
       .sort({ state: -1, order: -1 })
       .select("order title summary keywords state")
@@ -33,23 +39,29 @@ class NewsRepositories {
   };
 
   getNewsById = async (id: string) => {
+    const _id = new ObjectId(id);
     return News.findOne({
-      _id: id,
+      _id: _id,
     });
   };
 
   getNewsByIdAndState = async (news: string[], state: boolean) => {
+    const newsIdList = news.map((id) => {
+      const _id = new ObjectId(id);
+      return _id;
+    });
     return News.find({
       _id: {
-        $in: news,
+        $in: newsIdList,
       },
       state: state,
     });
   };
 
   getNewsByIdWithoutVote = async (id: string) => {
+    const _id = new ObjectId(id);
     return News.findOne({
-      _id: id,
+      _id: _id,
     }).select("title summary timeline comments state opinions keywords");
   };
 
@@ -66,40 +78,49 @@ class NewsRepositories {
   };
 
   getCommentsById = async (id: string) => {
+    const _id = new ObjectId(id);
     return News.findOne({
-      _id: id,
+      _id: _id,
     }).select("comments");
   };
 
   getKeywordsById = async (id: string) => {
-    return News.findOne({ _id: id }).select("keywords");
+    const _id = new ObjectId(id);
+    return News.findOne({ _id: _id }).select("keywords");
   };
   postNews = async (news: NewsInf) => {
     return News.create(news);
   };
 
   updateKeywordsById = async (id: string, keywords: string[]) => {
-    return News.findOneAndUpdate({ _id: id }, { keywords: keywords });
+    const _id = new ObjectId(id);
+    return News.findOneAndUpdate({ _id: _id }, { keywords: keywords });
   };
 
   updateNewsById = async (id: string, news: NewsInf) => {
+    const _id = new ObjectId(id);
     return News.updateOne(
       {
-        _id: id,
+        _id: _id,
       },
       news
     );
   };
 
   deleteNewsById = async (id: string) => {
+    const _id = new ObjectId(id);
     return News.deleteOne({
-      _id: id,
+      _id: _id,
     });
   };
 
   pushKeywordToNews = async (news: string[], keyword: string) => {
+    const newsIdList = news.map((id) => {
+      const _id = new ObjectId(id);
+      return _id;
+    });
     return News.updateMany(
-      { _id: { $in: news } },
+      { _id: { $in: newsIdList } },
       {
         $push: {
           keywords: keyword,
@@ -107,16 +128,20 @@ class NewsRepositories {
       }
     );
   };
-  pullKeywordFromNews = async (news :string[], keyword: string) => {
+  pullKeywordFromNews = async (news: string[], keyword: string) => {
+    const newsIdList = news.map((id) => {
+      const _id = new ObjectId(id);
+      return _id;
+    });
     return News.updateMany(
-        { _id: { $in: news } },
-        {
-          $pull: {
-            keywords: keyword,
-          },
-        }
-      );
-  }
+      { _id: { $in: newsIdList } },
+      {
+        $pull: {
+          keywords: keyword,
+        },
+      }
+    );
+  };
 }
 
 export const newsRepositories = new NewsRepositories();
