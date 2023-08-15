@@ -37,10 +37,9 @@ class KeywordRepositories {
         ? {}
         : {
             keyword: {
-              $regex: `/${search}/`,
+              $regex: `${search}`,
             },
           };
-
     return Keywords.find(query).select("_id keyword");
   };
 

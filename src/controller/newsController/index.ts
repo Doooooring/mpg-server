@@ -339,11 +339,6 @@ export const updateNewsData = async (req: Request, res: Response) => {
   try {
     const beforeNews = await newsRepositories.getNewsById(newsId as string);
 
-    const responseToSend = {
-      newsUpdateResponse: {},
-      keywordResponse: {},
-    };
-
     if (beforeNews === null) {
       throw new Error("It doesn't exist. Post it");
     }
@@ -352,8 +347,6 @@ export const updateNewsData = async (req: Request, res: Response) => {
       newsId,
       news
     );
-
-    responseToSend["newsUpdateResponse"] = newsUpdateResponse;
 
     const keywordList = news["keywords"];
     const keywordListBefore = beforeNews["keywords"];
@@ -399,7 +392,12 @@ export const updateNewsData = async (req: Request, res: Response) => {
     } else if (beforeNews["state"]) {
       if (!news["state"]) {
         await updateKeywordsState(keywordListBefore);
-        res.send(responseToSend);
+        res.send(
+          res.send({
+            success: true,
+            result: {},
+          })
+        );
       } else {
         const newsResponse = await keywordRepositories.updateKeywordsState(
           keywordAdded,
