@@ -288,9 +288,11 @@ export const getNewsComment = async (req: Request, res: Response) => {
 
 export const addNewsData = async (req: Request, res: Response) => {
   try {
-    const totalNum = await newsRepositories.getNewsCount();
+    // const totalNum = await newsRepositories.getNewsCount();
+    const maxOrder = await newsRepositories.getOrderMaximum();
+
     const news: NewsInf = {
-      order: totalNum + 1,
+      order: maxOrder + 1,
       votes: {
         left: 0,
         right: 0,
