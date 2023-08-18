@@ -83,9 +83,7 @@ class KeywordRepositories {
   };
 
   postKeyword = async (keyword: any) => {
-    return Keywords.create({
-      keyword,
-    });
+    return Keywords.create(keyword);
   };
 
   updateKeywordById = async (id: string, keyword: KeywordInf) => {

@@ -126,49 +126,58 @@ export const getNewsTitle = async (req: Request, res: Response) => {
 };
 
 export const getNewsByIdWithVote = async (req: Request, res: Response) => {
-  const { id } = req.query;
-  const token = req.headers.authorization;
-  const response = await newsRepositories.getNewsById(id as string);
-  if (response === null) {
+  try {
+    const { id } = req.query;
+    const token = req.headers.authorization;
+    const response = await newsRepositories.getNewsById(id as string);
+    if (response === null) {
+      res.send({
+        success: false,
+        result: {},
+      });
+      return;
+    }
+    const contentToSend = clone(response) as any;
+    contentToSend.comments =
+      Object.keys((contentToSend as NewsInf)?.comments ?? {}) ?? [];
+
+    if (token === null) {
+      res.send({
+        success: true,
+        result: { response: null, news: contentToSend },
+      });
+    } else {
+      const user: VoteInf | null = await Vote.findOne({ user: token });
+      if (user === null) {
+        res.send({
+          success: true,
+          result: {
+            response: null,
+            news: contentToSend,
+          },
+        });
+      } else {
+        const userVote = user.vote;
+        const curNews = userVote.filter((comp) => {
+          return comp.news === id;
+        });
+
+        const response = curNews.length !== 0 ? curNews[0].response : null;
+        res.send({
+          success: true,
+          result: {
+            response: response,
+            news: contentToSend,
+          },
+        });
+      }
+    }
+  } catch (e) {
+    console.log(e);
     res.send({
       success: false,
       result: {},
     });
-    return;
-  }
-  const contentToSend = clone(response) as any;
-  contentToSend.comments = Object.keys((contentToSend as NewsInf).comments);
-
-  if (token === null) {
-    res.send({
-      success: true,
-      result: { response: null, news: contentToSend },
-    });
-  } else {
-    const user: VoteInf | null = await Vote.findOne({ user: token });
-    if (user === null) {
-      res.send({
-        success: true,
-        result: {
-          response: null,
-          news: contentToSend,
-        },
-      });
-    } else {
-      const userVote = user.vote;
-      const curNews = userVote.filter((comp) => {
-        return comp.news === id;
-      });
-
-      const response = curNews.length !== 0 ? curNews[0].response : null;
-      res.send({
-        success: true,
-        result: {
-          response: response,
-          news: contentToSend,
-        },
-      });
-    }
   }
 };
 
@@ -340,7 +349,7 @@ export const addNewsData = async (req: Request, res: Response) => {
   }
 };
 
-export const postImageById = async (req: Request, res: Response) => {
+export const postNewsImageById = async (req: Request, res: Response) => {
   try {
     const img = req.file?.buffer;
     if (img === undefined) {

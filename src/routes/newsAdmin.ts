@@ -6,10 +6,9 @@ import {
   addNewsData,
   deleteNewsAll,
   deleteNewsData,
-  getImageById,
   getNewsById,
   getNewsTitle,
-  postImageById,
+  postNewsImageById,
   updateNewsData,
 } from "../controller/newsController";
 
@@ -24,10 +23,7 @@ router.route("/kmj123/deleteAll").delete(deleteNewsAll);
 
 router.route("/title").get(getNewsTitle);
 
-router
-  .route("/img/:id")
-  .get(getImageById)
-  .post(upload.single("img"), postImageById);
+router.route("/img/:id").get().post(upload.single("img"), postNewsImageById);
 
 router.route("/:id").get(getNewsById);
 
