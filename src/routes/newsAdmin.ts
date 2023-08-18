@@ -1,16 +1,21 @@
 import bodyParser from "body-parser";
 import express from "express";
+import multer from "multer";
 
 import {
   addNewsData,
   deleteNewsAll,
   deleteNewsData,
+  getImageById,
   getNewsById,
   getNewsTitle,
+  postImageById,
   updateNewsData,
 } from "../controller/newsController";
 
 const app = express();
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 app.use(bodyParser.json());
 
 const router = express.Router();
@@ -18,6 +23,11 @@ const router = express.Router();
 router.route("/kmj123/deleteAll").delete(deleteNewsAll);
 
 router.route("/title").get(getNewsTitle);
+
+router
+  .route("/img/:id")
+  .get(getImageById)
+  .post(upload.single("img"), postImageById);
 
 router.route("/:id").get(getNewsById);
 

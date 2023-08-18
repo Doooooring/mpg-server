@@ -1,4 +1,6 @@
 import { Request, Response } from "express";
+import fs from "fs";
+import path from "path";
 import { News } from "../..//schemas/news";
 import { NewsInf, commentType } from "../../interface/news";
 import { VoteInf } from "../../interface/vote";
@@ -76,6 +78,10 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
       console.log(err);
     }
   }
+};
+
+export const getImageById = async (req: Request, res: Response) => {
+  res.send();
 };
 
 export const getNewsById = async (req: Request, res: Response) => {
@@ -331,6 +337,34 @@ export const addNewsData = async (req: Request, res: Response) => {
       success: false,
       result: {},
     });
+  }
+};
+
+export const postImageById = async (req: Request, res: Response) => {
+  try {
+    const img = req.file?.buffer;
+    if (img === undefined) {
+      Error("image doesn't exist");
+      return;
+    }
+    const id = req.params.id;
+    console.log(img);
+
+    // let buffer = Buffer.from(img, "base64");
+    const filePath = path.join(__dirname, "../../images/news", id);
+
+    fs.writeFileSync(filePath, img);
+    res.send({
+      success: true,
+      result: {},
+    });
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      result: {},
+    });
+    return;
   }
 };
 

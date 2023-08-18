@@ -8,12 +8,14 @@ class NewsRepositories {
     return News.estimatedDocumentCount();
   };
 
-  getOrderMaximum = async () => {   
-    const response =  await News.find({}).sort({order : -1}).select("order").limit(1)
-    const maxOrderObj = response[0]
-    return maxOrderObj?.order ?? 0
-
-  }
+  getOrderMaximum = async () => {
+    const response = await News.find({})
+      .sort({ order: -1 })
+      .select("order")
+      .limit(1);
+    const maxOrderObj = response[0];
+    return maxOrderObj?.order ?? 0;
+  };
 
   getNewsInShortByIdList = async (
     page: number,
