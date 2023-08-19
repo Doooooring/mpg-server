@@ -436,12 +436,10 @@ export const updateNewsData = async (req: Request, res: Response) => {
     } else if (beforeNews["state"]) {
       if (!news["state"]) {
         await updateKeywordsState(keywordListBefore);
-        res.send(
-          res.send({
-            success: true,
-            result: {},
-          })
-        );
+        res.send({
+          success: true,
+          result: {},
+        });
       } else {
         const newsResponse = await keywordRepositories.updateKeywordsState(
           keywordAdded,
