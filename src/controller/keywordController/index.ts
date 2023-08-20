@@ -114,13 +114,22 @@ export const getKeywordWithNewsData = async (req: Request, res: Response) => {
     res.send("none");
     return;
   }
+
   const { news } = keyword;
-  const previews = await newsRepositories.getNewsInShort(Number(page), 20);
+  const previews = await newsRepositories.getNewsInShortByIdList(
+    Number(page),
+    news,
+    20
+  );
+  console.log(previews);
   const response = {
     keyword: keyword,
     previews: previews,
   };
-  res.send(JSON.stringify(response));
+  res.send({
+    success: true,
+    result: response,
+  });
 };
 
 export const addKeyword = async (req: Request, res: Response) => {
@@ -153,8 +162,11 @@ export const addKeyword = async (req: Request, res: Response) => {
     if (news.length !== 0) {
       const response2 = await newsRepositories.pushKeywordToNews(news, keyword);
     }
-    console.log(response1);
-    res.send(response1);
+
+    res.send({
+      success: true,
+      result: response1,
+    });
   } catch (e) {
     console.error(e);
     res.send(e);
@@ -257,7 +269,10 @@ export const updateKeyword = async (req: Request, res: Response) => {
       }
     }
 
-    res.send(response1);
+    res.send({
+      success: true,
+      result: response1,
+    });
   } catch (e) {
     console.log(e);
     res.send(Error("get some error"));
@@ -285,19 +300,22 @@ export const deleteKeyword = async (req: Request, res: Response) => {
         console.log(response);
       } catch (e) {
         console.log(e);
+        res.send({
+          success: false,
+          result: {},
+        });
+        return;
       }
     }
 
     res.send({
-      result: {
-        state: true,
-      },
+      success: true,
+      result: {},
     });
   } catch {
     res.send({
-      result: {
-        state: false,
-      },
+      success: false,
+      result: {},
     });
   }
 };
@@ -309,7 +327,7 @@ export const updateKeywordsState = async (keywords: string[]) => {
         updateKeywordState(keyword);
       })
     );
-    return true;
+    return { success: true, result: {} };
   } catch (e) {
     console.log("keyword update error!");
     console.log(e);
