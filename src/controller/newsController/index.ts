@@ -284,7 +284,7 @@ export const getNewsComment = async (req: Request, res: Response) => {
       return;
     }
     const page = parseInt(pageStr as string);
-    const comments = newsContents["comments"][type as commentType].slice(
+    const comments = newsContents["comments"][type as commentType].reverse().slice(
       page,
       page + 10
     );

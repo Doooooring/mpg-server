@@ -17,11 +17,19 @@ const app = express();
 
 app.set("port", process.env.PORT || 3000);
 app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-Connect();
 
-app.use(express.urlencoded({ extended: false }));
+Connect();
+app.use(
+  bodyParser.json({
+    limit: "50mb",
+  })
+);
+app.use(
+  express.urlencoded({
+    extended: false,
+    limit: "50mb",
+  })
+);
 
 //image static service
 //keyword image
