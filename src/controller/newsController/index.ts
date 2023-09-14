@@ -24,7 +24,7 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
   if (keyword === "") {
     try {
       const newsContents = await newsRepositories.getNewsInShort(
-        Number(page) * 20,
+        Number(page),
         20
       );
       res.send({
