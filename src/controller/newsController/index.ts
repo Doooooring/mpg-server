@@ -284,10 +284,9 @@ export const getNewsComment = async (req: Request, res: Response) => {
       return;
     }
     const page = parseInt(pageStr as string);
-    const comments = newsContents["comments"][type as commentType].reverse().slice(
-      page,
-      page + 10
-    );
+    const comments = newsContents["comments"][type as commentType]
+      .reverse()
+      .slice(page, page + 10);
     res.send({
       success: true,
       result: { comments },
@@ -324,6 +323,7 @@ export const addNewsData = async (req: Request, res: Response) => {
     if (keywordList.length != (checkKeywordExisted?.length ?? 0)) {
       throw new Error("The keyword that doesn't exist is here");
     }
+    console.log(news);
 
     const response = await newsRepositories.postNews(news);
 
