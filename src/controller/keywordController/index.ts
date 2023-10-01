@@ -110,6 +110,14 @@ export const getKeywordsForCategories = async (req: Request, res: Response) => {
   }
 };
 
+export const getKeywordByKey = async (req: Request, res: Response) => {
+  const { keyname } = req.query;
+  const keyword = await keywordRepositories.getKeywordByKey(keyname as string);
+  console.log("______");
+  console.log(keyword);
+  res.send({ success: true, result: { keyword: keyword } });
+};
+
 export const getKeywordWithNewsData = async (req: Request, res: Response) => {
   // const { page, keyword: keyname } = req.query;
   // const keyword = await keywordRepositories.getKeywordsWithNews(

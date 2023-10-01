@@ -4,6 +4,7 @@ import express from "express";
 import {
   addKeyword,
   deleteKeywordAll,
+  getKeywordByKey,
   getKeywordWithNewsData,
   getKeywords,
   getKeywordsByCategory,
@@ -19,9 +20,8 @@ const router = express.Router();
 
 router.route("/delete").delete(deleteKeywordAll);
 
+router.route("/key").get(getKeywordByKey);
 router.route("/keyword").get(getKeywords).patch();
-
-// router.route("/id").get(getKeywoa)
 
 router.route("/detail").get(getKeywordWithNewsData);
 
