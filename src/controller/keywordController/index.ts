@@ -35,6 +35,12 @@ export const getKeywords = async (req: Request, res: Response) => {
   }
 };
 
+// export const getKeywordIds = async (req: Request, res : Response) => {
+//   try {
+//     const response = await keywordRepositories.getKeyword
+//   }
+// }
+
 export const getKeywordInfoByKeyword = async (req: Request, res: Response) => {
   const { keyword } = req.params;
   try {
@@ -105,9 +111,14 @@ export const getKeywordsForCategories = async (req: Request, res: Response) => {
 };
 
 export const getKeywordWithNewsData = async (req: Request, res: Response) => {
-  const { page, keyword: keyname } = req.query;
-  const keyword = await keywordRepositories.getKeywordsWithNews(
-    keyname as string
+  // const { page, keyword: keyname } = req.query;
+  // const keyword = await keywordRepositories.getKeywordsWithNews(
+  //   keyname as string
+  // );
+
+  const { page, id } = req.query;
+  const keyword = await keywordRepositories.getKeywordsWithNewsById(
+    id as string
   );
 
   if (keyword === null) {

@@ -21,6 +21,8 @@ router.route("/delete").delete(deleteKeywordAll);
 
 router.route("/keyword").get(getKeywords).patch();
 
+// router.route("/id").get(getKeywoa)
+
 router.route("/detail").get(getKeywordWithNewsData);
 
 //특정 카테고리의 키워드 불러오기
