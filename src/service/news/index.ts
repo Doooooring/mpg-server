@@ -22,53 +22,61 @@ class NewsRepositories {
     news: string[],
     limit: number
   ) => {
-    const newsIdList = news.map((id) => {
-      const _id = new ObjectId(id);
-      return _id;
-    });
-    return News.aggregate([
-      {
-        $match: {
-          _id: { $in: newsIdList },
+    try {
+      const newsIdList = news.map((id) => {
+        try {
+          const _id = new ObjectId(id);
+          return _id;
+        } catch (e) {
+          return id;
+        }
+      });
+      return News.aggregate([
+        {
+          $match: {
+            _id: { $in: newsIdList },
+          },
         },
-      },
-      {
-        $addFields: {
-          lastTimelineDate: {
-            $let: {
-              vars: {
-                lastTimelineEntry: {
-                  $cond: {
-                    if: { $gt: [{ $size: "$timeline" }, 0] },
-                    then: { $arrayElemAt: ["$timeline", -1] },
-                    else: null,
+        {
+          $addFields: {
+            lastTimelineDate: {
+              $let: {
+                vars: {
+                  lastTimelineEntry: {
+                    $cond: {
+                      if: { $gt: [{ $size: "$timeline" }, 0] },
+                      then: { $arrayElemAt: ["$timeline", -1] },
+                      else: null,
+                    },
                   },
                 },
+                in: { $ifNull: ["$$lastTimelineEntry.date", "0000.00"] },
               },
-              in: { $ifNull: ["$$lastTimelineEntry.date", "0000.00"] },
             },
           },
         },
-      },
-      {
-        $sort: { state: -1, lastTimelineDate: -1 },
-      },
-      {
-        $project: {
-          order: 1,
-          title: 1,
-          summary: 1,
-          keywords: 1,
-          state: 1,
+        {
+          $sort: { state: -1, lastTimelineDate: -1 },
         },
-      },
-      {
-        $skip: page,
-      },
-      {
-        $limit: limit,
-      },
-    ]);
+        {
+          $project: {
+            order: 1,
+            title: 1,
+            summary: 1,
+            keywords: 1,
+            state: 1,
+          },
+        },
+        {
+          $skip: page,
+        },
+        {
+          $limit: limit,
+        },
+      ]);
+    } catch (e) {
+      return [];
+    }
   };
   // getNewsInShortByIdList = async (
   //   page: number,
