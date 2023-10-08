@@ -26,21 +26,107 @@ class NewsRepositories {
       const _id = new ObjectId(id);
       return _id;
     });
-    return News.find({
-      _id: { $in: newsIdList },
-    })
-      .sort({ state: -1, order: -1 })
-      .select("order title summary keywords state")
-      .skip(page)
-      .limit(limit);
+    return News.aggregate([
+      {
+        $match: {
+          _id: { $in: newsIdList },
+        },
+      },
+      {
+        $addFields: {
+          lastTimelineDate: {
+            $let: {
+              vars: {
+                lastTimelineEntry: {
+                  $cond: {
+                    if: { $gt: [{ $size: "$timeline" }, 0] },
+                    then: { $arrayElemAt: ["$timeline", -1] },
+                    else: null,
+                  },
+                },
+              },
+              in: { $ifNull: ["$$lastTimelineEntry.date", "0000.00"] },
+            },
+          },
+        },
+      },
+      {
+        $sort: { state: -1, lastTimelineDate: -1 },
+      },
+      {
+        $project: {
+          order: 1,
+          title: 1,
+          summary: 1,
+          keywords: 1,
+          state: 1,
+        },
+      },
+      {
+        $skip: page,
+      },
+      {
+        $limit: limit,
+      },
+    ]);
   };
+  // getNewsInShortByIdList = async (
+  //   page: number,
+  //   news: string[],
+  //   limit: number
+  // ) => {
+  //   const newsIdList = news.map((id) => {
+  //     const _id = new ObjectId(id);
+  //     return _id;
+  //   });
+  //   return News.find({
+  //     _id: { $in: newsIdList },
+  //   })
+  //     .sort({ state: -1, order: -1 })
+  //     .select("order title summary keywords state")
+  //     .skip(page)
+  //     .limit(limit);
+  // };
 
   getNewsInShort = async (page: number, limit: number) => {
-    return News.find({})
-      .sort({ state: -1, order: -1 })
-      .select("order title summary keywords state")
-      .skip(page)
-      .limit(limit);
+    return News.aggregate([
+      {
+        $addFields: {
+          lastTimelineDate: {
+            $let: {
+              vars: {
+                lastTimelineEntry: {
+                  $cond: {
+                    if: { $gt: [{ $size: "$timeline" }, 0] },
+                    then: { $arrayElemAt: ["$timeline", -1] },
+                    else: null,
+                  },
+                },
+              },
+              in: { $ifNull: ["$$lastTimelineEntry.date", "0000.00"] },
+            },
+          },
+        },
+      },
+      {
+        $sort: { state: -1, lastTimelineDate: -1 },
+      },
+      {
+        $project: {
+          order: 1,
+          title: 1,
+          summary: 1,
+          keywords: 1,
+          state: 1,
+        },
+      },
+      {
+        $skip: page,
+      },
+      {
+        $limit: limit,
+      },
+    ]);
   };
 
   getNewsByIdList = async (news: Array<string>) => {

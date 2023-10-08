@@ -27,6 +27,7 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
         Number(page),
         20
       );
+
       res.send({
         success: true,
         result: {
