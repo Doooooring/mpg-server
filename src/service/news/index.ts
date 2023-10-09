@@ -24,11 +24,12 @@ class NewsRepositories {
   ) => {
     try {
       const newsIdList = news.map((id) => {
+        const idParsed = id.replace(/"/g, "");
         try {
-          const _id = new ObjectId(id);
+          const _id = new ObjectId(idParsed);
           return _id;
         } catch (e) {
-          return id;
+          return "";
         }
       });
       return News.aggregate([

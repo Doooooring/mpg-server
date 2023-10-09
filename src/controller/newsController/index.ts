@@ -413,12 +413,12 @@ export const updateNewsData = async (req: Request, res: Response) => {
 
     const responseAdd = await keywordRepositories.pushNewsInfoToKeywords(
       keywordAdded,
-      JSON.stringify(newsId)
+      newsId
     );
 
-    const responseDeleted = await keywordRepositories.pushNewsInfoToKeywords(
+    const responseDeleted = await keywordRepositories.pullNewsInfoToKeywords(
       keywordDeleted,
-      JSON.stringify(newsId)
+      newsId
     );
 
     keywordResponse["responseAdd"] = responseAdd;
