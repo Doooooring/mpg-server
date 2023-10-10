@@ -33,7 +33,7 @@ class KeywordRepositories {
 
   getKeywordsWithNewsById = async (id: string) => {
     const _id = new ObjectId(id);
-    return Keywords.findOne({ _id: _id }).select("keyword, explain news");
+    return Keywords.findOne({ _id: _id }).select("keyword explain news");
   };
 
   getKeywordTitlesInShort = async (search: string) => {
