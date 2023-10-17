@@ -324,7 +324,6 @@ export const addNewsData = async (req: Request, res: Response) => {
     if (keywordList.length != (checkKeywordExisted?.length ?? 0)) {
       throw new Error("The keyword that doesn't exist is here");
     }
-    console.log(news);
 
     const response = await newsRepositories.postNews(news);
 

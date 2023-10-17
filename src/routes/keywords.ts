@@ -3,13 +3,12 @@ import express from "express";
 
 import {
   addKeyword,
-  deleteKeywordAll,
   getKeywordByKey,
   getKeywordWithNewsData,
   getKeywords,
   getKeywordsByCategory,
   getKeywordsForCategories,
-  updateKeyword,
+  updateKeyword
 } from "../controller/keywordController";
 
 const app = express();
@@ -18,7 +17,7 @@ app.use(bodyParser.json());
 const router = express.Router();
 //키워드만 불러오기
 
-router.route("/delete").delete(deleteKeywordAll);
+// router.route("/delete").delete(deleteKeywordAll);
 
 router.route("/key").get(getKeywordByKey);
 router.route("/keyword").get(getKeywords).patch();

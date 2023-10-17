@@ -5,7 +5,6 @@ import multer from "multer";
 import {
   addNewsData,
   deleteNewsAll,
-  deleteNewsData,
   getNewsById,
   getNewsTitle,
   postNewsImageById,
@@ -27,10 +26,7 @@ router.route("/img/:id").get().post(upload.single("img"), postNewsImageById);
 
 router.route("/:id").get(getNewsById);
 
-router
-  .route("/")
-  .post(addNewsData)
-  .patch(updateNewsData)
-  .delete(deleteNewsData);
+router.route("/").post(addNewsData).patch(updateNewsData);
+// .delete(deleteNewsData);
 
 export const newsAdminRoute = router;

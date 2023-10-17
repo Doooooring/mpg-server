@@ -21,10 +21,10 @@ router.route("/test").get(async (req: Request, res: Response) => {
   res.send(response);
 });
 
-router.route("/delete").delete(async (req: Request, res: Response) => {
-  const response = await News.deleteMany({});
-  res.send(response);
-});
+// router.route("/delete").delete(async (req: Request, res: Response) => {
+//   const response = await News.deleteMany({});
+//   res.send(response);
+// });
 
 // 기사 목록
 router.route("/preview").get(getNewsPreviewList);

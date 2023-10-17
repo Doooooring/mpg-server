@@ -5,7 +5,6 @@ import multer from "multer";
 import {
   addKeyword,
   deleteKeyword,
-  deleteKeywordAll,
   getKeywordInfoByKeyword,
   getKeywords,
   postKeywordImageById,
@@ -19,7 +18,7 @@ app.use(bodyParser.json());
 
 const router = express.Router();
 
-router.route("/kmj123/deleteAll").delete(deleteKeywordAll);
+// router.route("/kmj123/deleteAll").delete(deleteKeywordAll);
 
 router.route("/keyword").get(getKeywords);
 
