@@ -43,6 +43,7 @@ export const getKeywords = async (req: Request, res: Response) => {
 
 export const getKeywordInfoByKeyword = async (req: Request, res: Response) => {
   const { keyword } = req.params;
+  const decoded = keyword.replace(/\$/g, "/");
   try {
     const response = await keywordRepositories.getKeywordByKey(keyword);
     res.send({
