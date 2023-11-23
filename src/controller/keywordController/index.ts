@@ -378,24 +378,28 @@ export const updateKeywordState = async (keyword: string) => {
 };
 
 export const fixTheKeywords = async () => {
-  const keywords = await keywordRepositories.getKeywordsAll();
-  for (let k of keywords) {
-    const { _id, news } = k as {
-      _id: ObjectId;
-      keyword: string;
-      explain: string;
-      category: category;
-      recent: Boolean;
-      news: Array<string>;
-    };
-    const newArr = [] as Array<string>;
-    news.forEach((news) => {
-      newArr.push(news.replace(/"/g, ""));
-    });
-    console.log("_________");
-    console.log(news);
-    console.log(newArr);
-    k.news = newArr;
-    keywordRepositories.updateKeywordById(_id.toString(), k);
+  try {
+    const keywords = await keywordRepositories.getKeywordsAll();
+    for (let k of keywords) {
+      const { _id, news } = k as {
+        _id: ObjectId;
+        keyword: string;
+        explain: string;
+        category: category;
+        recent: Boolean;
+        news: Array<string>;
+      };
+      const newArr = [] as Array<string>;
+      news.forEach((news) => {
+        newArr.push(news.replace(/"/g, ""));
+      });
+      console.log("_________");
+      console.log(news);
+      console.log(newArr);
+      k.news = newArr;
+      keywordRepositories.updateKeywordById(_id.toString(), k);
+    }
+  } catch (e) {
+    console.log(e);
   }
 };
