@@ -5,7 +5,6 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 
-import { fixTheKeywords } from "./controller/keywordController";
 import { keywordRoute } from "./routes/keywords";
 import { keywordAdminRoute } from "./routes/keywordsAdmin";
 import { newsRoute } from "./routes/news";
@@ -15,8 +14,6 @@ import { Connect } from "./schemas/index";
 //import { voteRoute } from "./routes/vote";
 
 const app = express();
-
-fixTheKeywords();
 
 app.set("port", process.env.PORT || 3000);
 app.use(cors());
@@ -81,3 +78,5 @@ app.use("*", (req: Request, res: Response) => {
 app.listen(app.get("port"), () => {
   console.log(app.get("port"), "번 포트에서 대기중");
 });
+
+// fixTheKeywords();

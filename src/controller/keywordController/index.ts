@@ -393,9 +393,6 @@ export const fixTheKeywords = async () => {
       news.forEach((news) => {
         newArr.push(news.replace(/"/g, ""));
       });
-      console.log("_________");
-      console.log(news);
-      console.log(newArr);
       k.news = newArr;
       keywordRepositories.updateKeywordById(_id.toString(), k);
     }
