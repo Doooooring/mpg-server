@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import fs from "fs";
+import { ObjectId } from "mongoose";
 import path from "path";
 import { category } from "../../interface/keyword";
 import { Keywords } from "../../schemas/keywords";
@@ -373,5 +374,28 @@ export const updateKeywordState = async (keyword: string) => {
       [keyword],
       false
     );
+  }
+};
+
+export const fixTheKeywords = async () => {
+  const keywords = await keywordRepositories.getKeywordsAll();
+  for (let k of keywords) {
+    const { _id, news } = k as {
+      _id: ObjectId;
+      keyword: string;
+      explain: string;
+      category: category;
+      recent: Boolean;
+      news: Array<string>;
+    };
+    const newArr = [] as Array<string>;
+    news.forEach((news) => {
+      newArr.push(news.replace(/"/g, ""));
+    });
+    console.log("_________");
+    console.log(news);
+    console.log(newArr);
+    k.news = newArr;
+    keywordRepositories.updateKeywordById(_id.toString(), k);
   }
 };

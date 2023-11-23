@@ -10,6 +10,10 @@ class KeywordRepositories {
     }).select("news");
   };
 
+  getKeywordsAll = async () => {
+    return Keywords.find() as any;
+  };
+
   getKeywordByKey = async (keyword: string) => {
     return Keywords.findOne({ keyword: keyword });
   };

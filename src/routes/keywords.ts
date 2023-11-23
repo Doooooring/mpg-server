@@ -3,12 +3,13 @@ import express from "express";
 
 import {
   addKeyword,
+  fixTheKeywords,
   getKeywordByKey,
   getKeywordWithNewsData,
   getKeywords,
   getKeywordsByCategory,
   getKeywordsForCategories,
-  updateKeyword
+  updateKeyword,
 } from "../controller/keywordController";
 
 const app = express();
@@ -18,6 +19,8 @@ const router = express.Router();
 //키워드만 불러오기
 
 // router.route("/delete").delete(deleteKeywordAll);
+
+router.route("/fix").get(fixTheKeywords);
 
 router.route("/key").get(getKeywordByKey);
 router.route("/keyword").get(getKeywords).patch();

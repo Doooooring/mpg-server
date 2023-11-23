@@ -1,6 +1,3 @@
-import { NewsInf } from "../news";
-import mongoose from "mongoose";
-
 export enum category {
   human = "인물",
   politics = "정치",
