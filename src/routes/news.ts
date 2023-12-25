@@ -4,6 +4,7 @@ import {
   getNewsByIdWithVote,
   getNewsByKeyword,
   getNewsComment,
+  getNewsIds,
   getNewsPreviewList,
   setKeywordsById,
   updateKeywordsById,
@@ -25,6 +26,8 @@ router.route("/test").get(async (req: Request, res: Response) => {
 //   const response = await News.deleteMany({});
 //   res.send(response);
 // });
+
+router.route("/id").get(getNewsIds);
 
 // 기사 목록
 router.route("/preview").get(getNewsPreviewList);

@@ -4,6 +4,10 @@ import { News } from "../../schemas/news";
 const ObjectId = mongoose.Types.ObjectId;
 
 class NewsRepositories {
+  getNewsIds = async () => {
+    return News.find({}).select("_id");
+  };
+
   getNewsCount = async () => {
     return News.estimatedDocumentCount();
   };

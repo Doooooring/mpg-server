@@ -10,6 +10,11 @@ import { newsRepositories } from "../../service/news";
 import { clone } from "../../utils/common/index";
 import { updateKeywordsState } from "../keywordController";
 
+export const getNewsIds = async (req: Request, res: Response) => {
+  const response = await newsRepositories.getNewsIds();
+  res.send({ success: true, result: { data: response } });
+};
+
 export const getNewsPreviewList = async (req: Request, res: Response) => {
   const { page, keyword } = req.query;
   if (Number(page) === -1) {
