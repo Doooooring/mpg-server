@@ -40,7 +40,7 @@ class KeywordRepositories {
     return Keywords.findOne({ _id: _id }).select("keyword explain news");
   };
 
-  getKeywordTitlesInShort = async (search: string) => {
+  getKeywordTitlesInShort = async (search: string, offset? : number, limit? : number) => {
     const query =
       search === ""
         ? {}
@@ -49,7 +49,7 @@ class KeywordRepositories {
               $regex: `${search}`,
             },
           };
-    return Keywords.find(query).select("_id keyword");
+    return Keywords.find(query).select("_id keyword").skip(offset ?? 0);
   };
 
   getKeywordsInShortByCategory = async (

@@ -8,6 +8,7 @@ import {
   getKeywordWithNewsData,
   getKeywords,
   getKeywordsByCategory,
+  getKeywordsByFilter,
   getKeywordsForCategories,
   updateKeyword,
 } from "../controller/keywordController";
@@ -24,6 +25,7 @@ router.route("/fix").get(fixTheKeywords);
 
 router.route("/key").get(getKeywordByKey);
 router.route("/keyword").get(getKeywords).patch();
+router.route("/keywords").get(getKeywordsByFilter)
 
 router.route("/detail").get(getKeywordWithNewsData);
 

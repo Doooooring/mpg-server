@@ -36,6 +36,23 @@ export const getKeywords = async (req: Request, res: Response) => {
   }
 };
 
+export const getKeywordsByFilter = async (req: Request, res: Response) => {
+  const { search, offset, limit } = req.query;
+  try {
+    const response = await keywordRepositories.getKeywordTitlesInShort(
+      search as string,
+      Number(offset),
+      Number(limit)
+    );
+  } catch (e) {
+    console.log("get keywords by filter error", e);
+    res.send({
+      success: false,
+      result: [],
+    });
+  }
+};
+
 // export const getKeywordIds = async (req: Request, res : Response) => {
 //   try {
 //     const response = await keywordRepositories.getKeyword

@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import {
   addNewsData,
+  getNewsById,
   getNewsByIdWithVote,
   getNewsByKeyword,
   getNewsComment,
@@ -22,15 +23,7 @@ router.route("/test").get(async (req: Request, res: Response) => {
   res.send(response);
 });
 
-// router.route("/delete").delete(async (req: Request, res: Response) => {
-//   const response = await News.deleteMany({});
-//   res.send(response);
-// });
-
 router.route("/id").get(getNewsIds);
-
-// 기사 목록
-router.route("/preview").get(getNewsPreviewList);
 
 router
   .route("/keyword")
@@ -38,12 +31,19 @@ router
   .post(setKeywordsById)
   .patch(updateKeywordsById);
 
-// 기사 상세
+// 기사 상세 (deprecate)
 router.route("/detail").get(getNewsByIdWithVote).patch();
-
-router.route("/comment").get(getNewsComment);
 
 // 기사 등록
 router.route("/").get().post(addNewsData).patch(updateNewsData);
+
+// 기사 목록
+router.route("/preview").get(getNewsPreviewList);
+
+// 기사 상세
+router.route("/:id").get(getNewsById);
+
+// 기사 comment
+router.route("/:id/comment").get(getNewsComment);
 
 export const newsRoute = router;
