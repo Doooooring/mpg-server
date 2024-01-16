@@ -317,13 +317,25 @@ export const getNewsComment = async (req: Request, res: Response) => {
       return;
     }
     const page = parseInt(pageStr as string);
-    const comments = newsContents["comments"][type as commentType]
-      .reverse()
-      .slice(page, page + 10);
-    res.send({
-      success: true,
-      result: { comments },
-    });
+
+    /**
+     * @FIXME comments error
+     */
+
+    if ((type as string) in newsContents["comments"]) {
+      const comments = newsContents["comments"][type as commentType]
+        .reverse()
+        .slice(page, page + 10);
+      res.send({
+        success: true,
+        result: { comments },
+      });
+    } else {
+      res.send({
+        success: true,
+        result: { comments: [] },
+      });
+    }
   } catch (e) {
     console.log(e);
     res.send({
