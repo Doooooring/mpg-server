@@ -94,6 +94,28 @@ export const getNewsById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const response = await newsRepositories.getNewsByIdWithoutVote(id);
+
+    res.send({
+      success: true,
+      result: {
+        news: response,
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    res.send({
+      success: false,
+      result: {
+        news: null,
+      },
+    });
+  }
+};
+
+export const getNewsByIdClient = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const response = await newsRepositories.getNewsByIdWithoutVote(id);
     const contentToSend = clone(response) as any;
     contentToSend.comments =
       Object.keys((contentToSend as NewsInf)?.comments ?? {}) ?? [];
@@ -291,6 +313,7 @@ export const getNewsComment = async (req: Request, res: Response) => {
     const newsContents = await newsRepositories.getCommentsById(id as string);
     if (newsContents === null) {
       Error("news contents doesn't exist");
+
       return;
     }
     const page = parseInt(pageStr as string);

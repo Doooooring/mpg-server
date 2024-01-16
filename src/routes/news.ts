@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import {
   addNewsData,
-  getNewsById,
+  getNewsByIdClient,
   getNewsByIdWithVote,
   getNewsByKeyword,
   getNewsComment,
@@ -38,7 +38,7 @@ router.route("/detail").get(getNewsByIdWithVote).patch();
 router.route("/preview").get(getNewsPreviewList);
 
 // 기사 상세
-router.route("/:id").get(getNewsById);
+router.route("/:id").get(getNewsByIdClient);
 
 // 기사 comment
 router.route("/:id/comment").get(getNewsComment);
