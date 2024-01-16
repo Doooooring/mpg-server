@@ -131,7 +131,7 @@ export const getKeywordsForCategories = async (req: Request, res: Response) => {
 };
 
 export const getKeywordByKey = async (req: Request, res: Response) => {
-  const { keyname } = req.query;
+  const { keyname } = req.params;
   const keyword = await keywordRepositories.getKeywordByKey(keyname as string);
   res.send({ success: true, result: { keyword: keyword } });
 };

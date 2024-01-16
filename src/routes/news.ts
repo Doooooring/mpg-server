@@ -34,9 +34,6 @@ router
 // 기사 상세 (deprecate)
 router.route("/detail").get(getNewsByIdWithVote).patch();
 
-// 기사 등록
-router.route("/").get().post(addNewsData).patch(updateNewsData);
-
 // 기사 목록
 router.route("/preview").get(getNewsPreviewList);
 
@@ -45,5 +42,8 @@ router.route("/:id").get(getNewsById);
 
 // 기사 comment
 router.route("/:id/comment").get(getNewsComment);
+
+// 기사 등록
+router.route("/").get().post(addNewsData).patch(updateNewsData);
 
 export const newsRoute = router;
