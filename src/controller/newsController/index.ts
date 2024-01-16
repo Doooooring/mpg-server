@@ -94,10 +94,13 @@ export const getNewsById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const response = await newsRepositories.getNewsByIdWithoutVote(id);
+    const contentToSend = clone(response) as any;
+    contentToSend.comments =
+      Object.keys((contentToSend as NewsInf)?.comments ?? {}) ?? [];
     res.send({
       success: true,
       result: {
-        news: response,
+        news: contentToSend,
       },
     });
   } catch (e) {
