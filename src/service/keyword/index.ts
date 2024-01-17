@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { KeywordInf } from "../../interface/keyword";
 import { Keywords } from "../../schemas/keywords";
 const ObjectId = mongoose.Types.ObjectId;
+const INF = 10 ** 9;
 
 class KeywordRepositories {
   getNewsInKeyword = async (keyword: string) => {
@@ -40,7 +41,11 @@ class KeywordRepositories {
     return Keywords.findOne({ _id: _id }).select("keyword explain news");
   };
 
-  getKeywordTitlesInShort = async (search: string, offset? : number, limit? : number) => {
+  getKeywordTitlesInShort = async (
+    search: string,
+    offset?: number,
+    limit?: number
+  ) => {
     const query =
       search === ""
         ? {}
@@ -49,7 +54,10 @@ class KeywordRepositories {
               $regex: `${search}`,
             },
           };
-    return Keywords.find(query).select("_id keyword").skip(offset ?? 0);
+    return Keywords.find(query)
+      .select("_id keyword")
+      .skip(offset ?? 0)
+      .limit(limit ?? INF);
   };
 
   getKeywordsInShortByCategory = async (

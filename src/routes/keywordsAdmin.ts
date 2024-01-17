@@ -22,9 +22,9 @@ const router = express.Router();
 
 router.route("/keyword").get(getKeywords);
 
-router.route("/img/:id").get().post(upload.single("img"), postKeywordImageById);
-
 router.route("/:keyword").get(getKeywordInfoByKeyword);
+
+router.route("/img/:id").get().post(upload.single("img"), postKeywordImageById);
 
 router.route("/").post(addKeyword).patch(updateKeyword).delete(deleteKeyword);
 

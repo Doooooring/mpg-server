@@ -4,6 +4,8 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import fs from "fs";
 import path from "path";
+import session from 'express-session';
+
 
 import { keywordRoute } from "./routes/keywords";
 import { keywordAdminRoute } from "./routes/keywordsAdmin";

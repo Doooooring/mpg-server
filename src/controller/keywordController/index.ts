@@ -217,7 +217,6 @@ export const postKeywordImageById = async (req: Request, res: Response) => {
       return;
     }
     const id = req.params.id;
-    console.log(img);
 
     // let buffer = Buffer.from(img, "base64");
     const filePath = path.join(__dirname, "../../images/keyword", id);

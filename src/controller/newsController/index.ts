@@ -32,7 +32,6 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
         Number(page),
         Number(limit)
       );
-
       res.send({
         success: true,
         result: {
@@ -94,7 +93,6 @@ export const getNewsById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const response = await newsRepositories.getNewsByIdWithoutVote(id);
-
     res.send({
       success: true,
       result: {
