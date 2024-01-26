@@ -1,23 +1,22 @@
-import express, { Request, Response } from "express";
-
 import bodyParser from "body-parser";
 import cors from "cors";
+import express, { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
-import session from 'express-session';
 
-
+import { authRoute } from "./routes/auth";
 import { keywordRoute } from "./routes/keywords";
 import { keywordAdminRoute } from "./routes/keywordsAdmin";
 import { newsRoute } from "./routes/news";
 import { newsAdminRoute } from "./routes/newsAdmin";
+import { userRoute } from "./routes/user";
 import { voteRoute } from "./routes/vote";
 import { Connect } from "./schemas/index";
 //import { voteRoute } from "./routes/vote";
 
 const app = express();
 
-app.set("port", process.env.PORT || 3000);
+app.set("port", process.env.PORT || 8080);
 app.use(cors());
 
 Connect();
@@ -69,6 +68,8 @@ app.use(
 //repository router
 app.use("/news", newsRoute);
 app.use("/keywords", keywordRoute);
+app.use("/user", userRoute);
+app.use("/auth", authRoute);
 app.use("/admin/news", newsAdminRoute);
 app.use("/admin/keywords", keywordAdminRoute);
 app.use("/vote", voteRoute);

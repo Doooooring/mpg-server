@@ -5,12 +5,10 @@ const { Schema } = mongoose;
 const voteSchema = new Schema(
   {
     user: { type: String, required: true },
-    vote: {
-      type: Array<{
-        news: String;
-        response: String;
-      }>,
-      default: [],
+    news: { type: String, required: true },
+    response: {
+      type: String,
+      required: true,
     },
   },
   {
