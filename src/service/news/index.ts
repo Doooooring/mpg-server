@@ -155,7 +155,8 @@ class NewsRepositories {
 
   getNewsByIdAndState = async (news: string[], state: boolean) => {
     const newsIdList = news.map((id) => {
-      const _id = new ObjectId(id);
+      const idParsed = id.replace(/"/g, "");
+      const _id = new ObjectId(idParsed);
       return _id;
     });
     return News.find({
