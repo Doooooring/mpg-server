@@ -3,7 +3,8 @@ import { Request, Response } from "express";
 import { Platform } from "../../interface/common";
 import { googleRepositories } from "../../service/auth/google";
 import { kakaoRepositories } from "../../service/auth/kakao";
-import { issueYVoteToken, upsertUsers } from "./auth.tools";
+import { issueRefreshToken, issueYVoteToken } from "../../tools/auth";
+import { upsertUsers } from "./auth.tools";
 
 export const kakaoLogin = async (req: Request, res: Response) => {
   try {
@@ -27,6 +28,8 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     upsertUsers(email, name, Platform.KAKAO);
 
     const yVoteToken = issueYVoteToken(email, Platform.KAKAO);
+    const refreshToken = issueRefreshToken();
+
 
     res.send({
       success: true,
@@ -51,7 +54,7 @@ export const kakaoLogout = async (req: Request, res: Response) => {
     }
     const data = await kakaoRepositories.kakaoLogout(token);
     res.send({
-      success: false,
+      success: true,
       result: {
         id: data.id,
       },
@@ -78,6 +81,7 @@ export const googleLogin = async (req: Request, res: Response) => {
     upsertUsers(email, name, Platform.GOOGLE);
 
     const yVoteToken = issueYVoteToken(email, Platform.GOOGLE);
+    const refreshToken = issueRefreshToken();
 
     res.send({
       success: true,

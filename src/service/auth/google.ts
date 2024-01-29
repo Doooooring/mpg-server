@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// export const GOOGLE_API_URL = "https://kapi.kakao.com/v2/";
 export const GOOGLE_AUTH_URL = "https://www.googleapis.com/Oauth2/";
 
 class GoogleRepositories {
@@ -17,6 +16,7 @@ class GoogleRepositories {
       return e;
     }
   };
+  
 }
 
 export const googleRepositories = new GoogleRepositories();
