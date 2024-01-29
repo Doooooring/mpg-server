@@ -4,6 +4,7 @@ import express, { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 
+import { apiRoute } from "./routes/api";
 import { authRoute } from "./routes/auth";
 import { keywordRoute } from "./routes/keywords";
 import { keywordAdminRoute } from "./routes/keywordsAdmin";
@@ -31,6 +32,8 @@ app.use(
     limit: "50mb",
   })
 );
+
+app.use("/api", express.static("src/apidoc"));
 
 //image static service
 //keyword image
@@ -65,7 +68,9 @@ app.use(
   express.static("src/images/news")
 );
 
+
 //repository router
+app.use("/api", apiRoute);
 app.use("/news", newsRoute);
 app.use("/keywords", keywordRoute);
 app.use("/user", userRoute);
