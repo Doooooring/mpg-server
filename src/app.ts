@@ -17,7 +17,7 @@ import { Connect } from "./schemas/index";
 
 const app = express();
 
-app.set("port", process.env.PORT || 8080);
+app.set("port", process.env.PORT || 3000);
 app.use(cors());
 
 Connect();
@@ -67,7 +67,6 @@ app.use(
   },
   express.static("src/images/news")
 );
-
 
 //repository router
 app.use("/api", apiRoute);
