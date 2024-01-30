@@ -16,7 +16,7 @@ export const getNewsIds = async (req: Request, res: Response) => {
 };
 
 export const getNewsPreviewList = async (req: Request, res: Response) => {
-  const { page, limit = 20, keyword = "" } = req.query;
+  const { page = 0, limit = 20, keyword = "" } = req.query;
   if (Number(page) === -1) {
     res.send({
       success: false,
@@ -306,7 +306,7 @@ export const updateKeywordsById = async (req: Request, res: Response) => {
 
 export const getNewsComment = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { type, page: pageStr } = req.query;
+  const { type, page: pageStr, limit = "10" } = req.query;
   try {
     const newsContents = await newsRepositories.getCommentsById(id as string);
     if (newsContents === null) {
@@ -323,7 +323,7 @@ export const getNewsComment = async (req: Request, res: Response) => {
     if ((type as string) in newsContents["comments"]) {
       const comments = newsContents["comments"][type as commentType]
         .reverse()
-        .slice(page, page + 10);
+        .slice(page, page + parseInt(limit as string));
       res.send({
         success: true,
         result: { comments },

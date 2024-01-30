@@ -142,7 +142,7 @@ export const getKeywordWithNewsData = async (req: Request, res: Response) => {
   //   keyname as string
   // );
 
-  const { page, id } = req.query;
+  const { page = 0, limit = 20, id } = req.query;
   const keyword = await keywordRepositories.getKeywordsWithNewsById(
     id as string
   );
@@ -156,7 +156,7 @@ export const getKeywordWithNewsData = async (req: Request, res: Response) => {
   const previews = await newsRepositories.getNewsInShortByIdList(
     Number(page),
     news,
-    20
+    Number(limit)
   );
   const response = {
     keyword: keyword,
