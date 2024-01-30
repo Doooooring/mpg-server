@@ -3,7 +3,7 @@
  * 
  * @apiVersion        1.0.0
  * @apiName GetKeywordList
- * @apiGroup 2.Keyword
+ * @apiGroup Keyword
  *
  * @apiQuery {string} search Keyword Filter
  * @apiQuery {number} offset keyword list offset

@@ -3,7 +3,7 @@
  * 
  * @apiVersion        1.0.0
  * @apiName GoogleLogin
- * @apiGroup 3.Auth
+ * @apiGroup Auth
  *
  * @apiHeader {String} Authorization='Bearer ${string}'
  *
@@ -24,7 +24,7 @@
  * 
  * @apiVersion        1.0.0
  * @apiName KakaoLogin
- * @apiGroup 3.Auth
+ * @apiGroup Auth
  *
  * @apiHeader {String} Authorization='Bearer ${string}'
  *

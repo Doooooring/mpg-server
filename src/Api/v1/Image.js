@@ -3,7 +3,7 @@
  *
  * @apiVersion        1.0.0
  * @apiName NewsImage
- * @apiGroup 4.Image
+ * @apiGroup Image
  *
  * @apiParam {string} id News id
  *
@@ -14,7 +14,7 @@
  *
  * @apiVersion        1.0.0
  * @apiName KeywordImage
- * @apiGroup 4.Image
+ * @apiGroup Image
  *
  * @apiParam {string} id News id
  *
