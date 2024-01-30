@@ -16,7 +16,7 @@ export const getNewsIds = async (req: Request, res: Response) => {
 };
 
 export const getNewsPreviewList = async (req: Request, res: Response) => {
-  const { page, limit = 20, keyword = "" } = req.query;
+  const { page = 0, limit = 20, keyword = "" } = req.query;
   if (Number(page) === -1) {
     res.send({
       success: false,
