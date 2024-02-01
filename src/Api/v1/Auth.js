@@ -69,22 +69,16 @@
  *     }
  */
 
-``; /**
- * @api {post} /auth/logout Request Login on Kakao
- * 
+``;
+/**
+ * @api {post} /auth/logout Request Logout
+ *
  * @apiVersion        1.0.0
- * @apiName KakaoLogin
+ * @apiName Logout
  * @apiGroup Auth
  *
  * @apiHeader {String} Authorization='Bearer ${string}'
  *
-  * @apiSuccessExample Success-Response:
- *      HTTP/1.1 200 OK
- *      {
-            success : boolean, 
-            result : {
-                access : string,
-                refresh : string
-            }
-        }
+ * @apiBody {access=string} access token to expire
+ * @apiBody {refresh=string} refresh token to expire
  */
