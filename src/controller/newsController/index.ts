@@ -74,7 +74,7 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
         },
       });
     } catch (err) {
-      res.send({
+      res.status(500).send({
         success: false,
         result: {
           news: [],

@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import { Platform } from "../interface/common";
 
-const SECRET = "YVOTEJwTSecret";
+const ACCESS_SECRET = "YVOTEAccEsSecret";
+const REFRESH_SECRET = "YVOTERefrESHSecret";
 
 export const issueYVoteToken = (email: string, platform: Platform) => {
   const payload = {
@@ -9,7 +10,7 @@ export const issueYVoteToken = (email: string, platform: Platform) => {
     platform,
   };
 
-  const yVoteToken = jwt.sign(payload, SECRET, {
+  const yVoteToken = jwt.sign(payload, ACCESS_SECRET, {
     algorithm: "HS256",
     expiresIn: "3h",
     issuer: "yVote",
@@ -19,7 +20,7 @@ export const issueYVoteToken = (email: string, platform: Platform) => {
 
 export const verifyYVoteToken = (token: string) => {
   try {
-    const data = jwt.verify(token, SECRET);
+    const data = jwt.verify(token, ACCESS_SECRET);
 
     return {
       state: true,
@@ -36,8 +37,8 @@ export const verifyYVoteToken = (token: string) => {
   }
 };
 
-export const issueRefreshToken = () => {
-  const refreshToken = jwt.sign({}, SECRET, {
+export const issueRefreshToken = (email: string, platform: Platform) => {
+  const refreshToken = jwt.sign({ email, platform }, REFRESH_SECRET, {
     algorithm: "HS256",
     expiresIn: 60 * 60 * 24 * 30,
     issuer: "yVote",
@@ -47,13 +48,18 @@ export const issueRefreshToken = () => {
 
 export const veriyRefreshToken = (token: string) => {
   try {
-    const data = jwt.verify(token, SECRET);
+    const data = jwt.verify(token, REFRESH_SECRET);
     return {
       state: true,
+      payload: data as {
+        email: string;
+        platform: Platform;
+      },
     };
   } catch (e) {
     return {
       state: false,
+      payload: {},
     };
   }
 };

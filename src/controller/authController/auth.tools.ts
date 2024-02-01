@@ -6,9 +6,16 @@ export const upsertUsers = async (
   name: string,
   platform: Platform
 ) => {
-  const user = userRepositories.getUserInfoByEmailAndPlatform(email, platform);
-  if (!user) {
-    const response = await userRepositories.postUser(email, name, platform);
+  try {
+    const user = userRepositories.getUserInfoByEmailAndPlatform(
+      email,
+      platform
+    );
+    if (!user) {
+      const response = await userRepositories.postUser(email, name, platform);
+    }
+    return true;
+  } catch (e) {
+    return e;
   }
-  return;
 };

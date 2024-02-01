@@ -3,7 +3,11 @@ import { Request, Response } from "express";
 import { Platform } from "../../interface/common";
 import { googleRepositories } from "../../service/auth/google";
 import { kakaoRepositories } from "../../service/auth/kakao";
-import { issueRefreshToken, issueYVoteToken } from "../../tools/auth";
+import {
+  issueRefreshToken,
+  issueYVoteToken,
+  veriyRefreshToken,
+} from "../../tools/auth";
 import { upsertUsers } from "./auth.tools";
 
 export const kakaoLogin = async (req: Request, res: Response) => {
@@ -28,13 +32,13 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     upsertUsers(email, name, Platform.KAKAO);
 
     const yVoteToken = issueYVoteToken(email, Platform.KAKAO);
-    const refreshToken = issueRefreshToken();
-
+    const refreshToken = issueRefreshToken(email, Platform.KAKAO);
 
     res.send({
       success: true,
       result: {
-        yVoteToken,
+        access: yVoteToken,
+        refresh: refreshToken,
         name,
         email,
       },
@@ -81,12 +85,13 @@ export const googleLogin = async (req: Request, res: Response) => {
     upsertUsers(email, name, Platform.GOOGLE);
 
     const yVoteToken = issueYVoteToken(email, Platform.GOOGLE);
-    const refreshToken = issueRefreshToken();
+    const refreshToken = issueRefreshToken(email, Platform.GOOGLE);
 
     res.send({
       success: true,
       result: {
-        yVoteToken,
+        access: yVoteToken,
+        refresh: refreshToken,
         name,
         email,
       },
@@ -98,3 +103,38 @@ export const googleLogin = async (req: Request, res: Response) => {
 };
 
 export const googleLogout = (req: Request, res: Response) => {};
+
+export const tokenRefresh = (req: Request, res: Response) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) {
+      Error("User token is not defined");
+      return;
+    }
+    const response = veriyRefreshToken(token as string);
+    if (!response.state) {
+      Error("Refresh Expired");
+      return;
+    }
+
+    const { email, platform } = response.payload as {
+      email: string;
+      platform: Platform;
+    };
+
+    const accessToken = issueYVoteToken(email, platform);
+    res.send({
+      state: true,
+      result: {
+        access: accessToken,
+      },
+    });
+  } catch (e) {
+    res.status(401).send({
+      state: false,
+      result: {
+        error: e,
+      },
+    });
+  }
+};
