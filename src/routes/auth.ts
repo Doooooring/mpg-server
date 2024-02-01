@@ -1,20 +1,17 @@
 import express from "express";
 import {
   googleLogin,
-  googleLogout,
   kakaoLogin,
-  kakaoLogout,
+  logout,
   tokenRefresh,
 } from "../controller/authController";
 const app = express();
 const router = express.Router();
 
-router.route("/kakao/logout").post(kakaoLogout);
 router.route("/kakao/login").post(kakaoLogin);
-
-router.route("/google/logout").post(googleLogout);
 router.route("/google/login").post(googleLogin);
 
+router.route("/logout").post(logout);
 router.route("/refresh").post(tokenRefresh);
 
 router.route("/");
