@@ -147,7 +147,8 @@ class NewsRepositories {
   };
 
   getNewsById = async (id: string) => {
-    const _id = new ObjectId(id);
+    const idParsed = id.replace(/"/g, "");
+    const _id = new ObjectId(idParsed);
     return News.findOne({
       _id: _id,
     });
@@ -168,7 +169,8 @@ class NewsRepositories {
   };
 
   getNewsByIdWithoutVote = async (id: string) => {
-    const _id = new ObjectId(id);
+    const idParsed = id.replace(/"/g, "");
+    const _id = new ObjectId(idParsed);
     return News.findOne({
       _id: _id,
     }).select("title summary timeline comments state opinions keywords");
@@ -187,14 +189,16 @@ class NewsRepositories {
   };
 
   getCommentsById = async (id: string) => {
-    const _id = new ObjectId(id);
+    const idParsed = id.replace(/"/g, "");
+    const _id = new ObjectId(idParsed);
     return News.findOne({
       _id: _id,
     }).select("comments");
   };
 
   getKeywordsById = async (id: string) => {
-    const _id = new ObjectId(id);
+    const idParsed = id.replace(/"/g, "");
+    const _id = new ObjectId(idParsed);
     return News.findOne({ _id: _id }).select("keywords");
   };
   postNews = async (news: NewsInf) => {
@@ -202,12 +206,14 @@ class NewsRepositories {
   };
 
   updateKeywordsById = async (id: string, keywords: string[]) => {
-    const _id = new ObjectId(id);
+    const idParsed = id.replace(/"/g, "");
+    const _id = new ObjectId(idParsed);
     return News.findOneAndUpdate({ _id: _id }, { keywords: keywords });
   };
 
   updateNewsById = async (id: string, news: NewsInf) => {
-    const _id = new ObjectId(id);
+    const idParsed = id.replace(/"/g, "");
+    const _id = new ObjectId(idParsed);
     return News.updateOne(
       {
         _id: _id,
@@ -217,7 +223,8 @@ class NewsRepositories {
   };
 
   deleteNewsById = async (id: string) => {
-    const _id = new ObjectId(id);
+    const idParsed = id.replace(/"/g, "");
+    const _id = new ObjectId(idParsed);
     return News.deleteOne({
       _id: _id,
     });
@@ -225,7 +232,8 @@ class NewsRepositories {
 
   pushKeywordToNews = async (news: string[], keyword: string) => {
     const newsIdList = news.map((id) => {
-      const _id = new ObjectId(id);
+      const idParsed = id.replace(/"/g, "");
+      const _id = new ObjectId(idParsed);
       return _id;
     });
     return News.updateMany(
@@ -239,7 +247,8 @@ class NewsRepositories {
   };
   pullKeywordFromNews = async (news: string[], keyword: string) => {
     const newsIdList = news.map((id) => {
-      const _id = new ObjectId(id);
+      const idParsed = id.replace(/"/g, "");
+      const _id = new ObjectId(idParsed);
       return _id;
     });
     return News.updateMany(
