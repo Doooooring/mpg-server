@@ -64,7 +64,27 @@
  *     {
  *       "success" : false,
  *       "result" : {
- *         "error" : "The authorization token is needed"   
+ *              "error" : "The authorization token is needed"   
  *       }
  *     }
+ */
+
+``; /**
+ * @api {post} /auth/logout Request Login on Kakao
+ * 
+ * @apiVersion        1.0.0
+ * @apiName KakaoLogin
+ * @apiGroup Auth
+ *
+ * @apiHeader {String} Authorization='Bearer ${string}'
+ *
+  * @apiSuccessExample Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+            success : boolean, 
+            result : {
+                access : string,
+                refresh : string
+            }
+        }
  */
