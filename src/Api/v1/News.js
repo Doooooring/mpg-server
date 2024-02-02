@@ -1,9 +1,10 @@
 /** 
+ * @api / Interface
  * @apiVersion        1.0.0
  * @apiName NewsInterface
  * @apiGroup News
  *
- * @apiSuccessExample News Interface:
+ * @apiSuccessExample News Interface
  *   {
       _id: Types.ObjectId;
       order: number;

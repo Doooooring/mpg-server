@@ -69,7 +69,6 @@
  *     }
  */
 
-``;
 /**
  * @api {post} /auth/logout Request Logout
  *
