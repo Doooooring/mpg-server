@@ -65,7 +65,7 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
       const newsContents = await newsRepositories.getNewsInShortByIdList(
         Number(page),
         news,
-        20
+        Number(limit)
       );
       res.send({
         success: true,

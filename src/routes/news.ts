@@ -43,6 +43,8 @@ router.route("/:id").get(getNewsByIdClient);
 // 기사 comment
 router.route("/:id/comment").get(getNewsComment);
 
+router.route("/:id/vote").get().post();
+
 // 기사 등록
 router.route("/").get().post(addNewsData).patch(updateNewsData);
 

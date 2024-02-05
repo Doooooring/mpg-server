@@ -131,6 +131,7 @@ class NewsRepositories {
           summary: 1,
           keywords: 1,
           state: 1,
+          lastTimelineDate: 1,
         },
       },
       {
