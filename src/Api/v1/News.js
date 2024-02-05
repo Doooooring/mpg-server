@@ -179,7 +179,8 @@
  *
  * @apiParam {String} id News id
  *
- * @apiBody {string='left','right','none'} response User vote response "left" | "right" | "none" | null (left : 반대에요, right : 찬성이에요, none : 잘 모르겠어요, null : 응답없음)
+
+ * @apiBody {string='left','right','none',null} response User vote response "left" | "right" | "none" | null
  *
  * @apiSuccessExample Success-Response:
  *      HTTP/1.1 200 OK
