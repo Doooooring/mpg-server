@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import { auth } from "../controller/authController";
 import {
   addNewsData,
   getNewsByIdClient,
@@ -10,6 +11,7 @@ import {
   setKeywordsById,
   updateKeywordsById,
   updateNewsData,
+  voteByNewsData,
 } from "../controller/newsController";
 import { News } from "../schemas/news";
 
@@ -42,6 +44,7 @@ router.route("/:id").get(getNewsByIdClient);
 
 // 기사 comment
 router.route("/:id/comment").get(getNewsComment);
+router.route("/:id/vote").post(auth, voteByNewsData);
 
 // 기사 등록
 router.route("/").get().post(addNewsData).patch(updateNewsData);

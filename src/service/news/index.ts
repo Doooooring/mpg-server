@@ -216,12 +216,11 @@ class NewsRepositories {
     );
   };
 
-  deleteNewsById = async (id: string) => {
-    const _id = new ObjectId(id);
-    return News.deleteOne({
-      _id: _id,
-    });
-  };
+  postVoteToNews = async (
+    user: string,
+    news: string,
+    response: "left" | "right" | "none" | null
+  ) => {};
 
   pushKeywordToNews = async (news: string[], keyword: string) => {
     const newsIdList = news.map((id) => {
@@ -237,6 +236,7 @@ class NewsRepositories {
       }
     );
   };
+
   pullKeywordFromNews = async (news: string[], keyword: string) => {
     const newsIdList = news.map((id) => {
       const _id = new ObjectId(id);
@@ -250,6 +250,13 @@ class NewsRepositories {
         },
       }
     );
+  };
+
+  deleteNewsById = async (id: string) => {
+    const _id = new ObjectId(id);
+    return News.deleteOne({
+      _id: _id,
+    });
   };
 }
 

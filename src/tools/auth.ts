@@ -40,8 +40,9 @@ export const verifyYVoteToken = (token: string) => {
 export const issueRefreshToken = (email: string, platform: Platform) => {
   const refreshToken = jwt.sign({ email, platform }, REFRESH_SECRET, {
     algorithm: "HS256",
-    expiresIn: 60 * 60 * 24 * 30,
+    expiresIn: 60 * 60 * 24 * 30 * 6, //refresh 6 month
     issuer: "yVote",
+
   });
   return refreshToken;
 };

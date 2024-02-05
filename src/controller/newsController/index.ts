@@ -2,11 +2,13 @@ import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import { News } from "../..//schemas/news";
+import { Platform } from "../../interface/common";
 import { NewsInf, commentType } from "../../interface/news";
 import { VoteInf } from "../../interface/vote";
 import { Vote } from "../../schemas/vote";
 import { keywordRepositories } from "../../service/keyword";
 import { newsRepositories } from "../../service/news";
+import { verifyYVoteToken } from "../../tools/auth";
 import { clone } from "../../utils/common/index";
 import { updateKeywordsState } from "../keywordController";
 
@@ -503,6 +505,25 @@ export const updateNewsData = async (req: Request, res: Response) => {
       result: {},
     });
   }
+};
+
+export const voteByNewsData = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const token = req.headers.authorization;
+  const response = req.body.response as "left" | "right" | "none" | null;
+  try {
+    const {
+      payload: { email, platform },
+    } = verifyYVoteToken(token as string) as {
+      state: boolean;
+      payload: {
+        email: string;
+        platform: Platform;
+      };
+    };
+
+    const res = await newsRepositories.postVoteToNews(email, id, response);
+  } catch (e) {}
 };
 
 export const deleteNewsData = async (req: Request, res: Response) => {

@@ -6,6 +6,7 @@ import { kakaoRepositories } from "../../service/auth/kakao";
 import {
   issueRefreshToken,
   issueYVoteToken,
+  verifyYVoteToken,
   veriyRefreshToken,
 } from "../../tools/auth";
 import { upsertUsers } from "./auth.tools";
@@ -144,5 +145,39 @@ export const tokenRefresh = (req: Request, res: Response) => {
         error: e,
       },
     });
+  }
+};
+
+export const auth = (req: Request, res: Response, next: any) => {
+  try {
+    const token = req.headers.authorization;
+    if (!token) {
+      Error("TokenExpiredError");
+      return;
+    }
+
+    const { state, payload } = verifyYVoteToken(token);
+    if (!state) {
+      Error("JsonWebTokenError");
+    }
+    next();
+  } catch (e: any) {
+    if (e.name === "TokenExpiredError") {
+      return res.status(419).send({
+        success: false,
+        result: {
+          message: "토큰이 만료되었습니다.",
+        },
+      });
+    }
+    // 토큰의 비밀키가 일치하지 않는 경우
+    if (e.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        success: false,
+        result: {
+          message: "유효하지 않은 토큰입니다.",
+        },
+      });
+    }
   }
 };
