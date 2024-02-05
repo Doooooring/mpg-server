@@ -141,8 +141,7 @@
  *
  * @apiParam {String} id News id
  *
- * @apiBody {string='left','right','none'} response User vote response "left" | "right" | "none"
- * @apiBody {number=1,-1} result Vote or cancel. Case 1 Vote : result = 1, Case 2 Cancel : result = - 1
+ * @apiBody {string='left','right','none',null} response User vote response "left" | "right" | "none" | null
  *
  * @apiSuccessExample Success-Response:
  *      HTTP/1.1 200 OK
