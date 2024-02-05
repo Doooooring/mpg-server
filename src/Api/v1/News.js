@@ -1,3 +1,46 @@
+/** 
+ * @api / Interface
+ * @apiVersion        1.0.0
+ * @apiName NewsInterface
+ * @apiGroup News
+ *
+ * @apiSuccessExample News Interface
+ *   {
+      _id: Types.ObjectId;
+      order: number;
+      title: string;
+      summary: string;
+      news: Array<{ date: Date; title: string; link: string }>;
+      journals: Array<{ press: string; title: string; link: string }>;
+      keywords: Array<string>;
+      state: Boolean;
+      opinions: {
+        left: string;
+        right: string;
+      };
+      comments: Array<Comment>;
+    }
+
+    enum Comment {
+      전략가,
+      지도자,
+      예술가,
+      감시자,
+      운영자,
+      공화주의자,
+      관찰자,
+      개혁가,
+      이론가,
+      자유주의자,
+      민주당,
+      국민의힘,
+      청와대,
+      헌법재판소,
+      와이보트,
+      기타,
+    }
+ */
+
 /**
  * @api {get} /news/:id Request News Details
  * 
@@ -25,12 +68,7 @@
                 left: string;
                 right: string;
               };
-              comments: Array<comment>;
-              votes: {
-                left: number;
-                right: number;
-                none: number;
-              };
+              comments: Array<Comment>;
             }
           }
         }
@@ -141,8 +179,8 @@
  *
  * @apiParam {String} id News id
  *
- * @apiBody {string='left','right','none'} response User vote response "left" | "right" | "none"
- * @apiBody {number=1,-1} result Vote or cancel. Case 1 Vote : result = 1, Case 2 Cancel : result = - 1
+
+ * @apiBody {string='left','right','none',null} response User vote response "left" | "right" | "none" | null
  *
  * @apiSuccessExample Success-Response:
  *      HTTP/1.1 200 OK

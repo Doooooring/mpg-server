@@ -46,6 +46,8 @@ router.route("/:id").get(getNewsByIdClient);
 router.route("/:id/comment").get(getNewsComment);
 router.route("/:id/vote").post(auth, voteByNewsData);
 
+router.route("/:id/vote").get().post();
+
 // 기사 등록
 router.route("/").get().post(addNewsData).patch(updateNewsData);
 
