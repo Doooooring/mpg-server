@@ -101,33 +101,33 @@
  */
 
 /**
- * @api {get} /news/:id/result Request News Comments
- * 
- * @apiVersion        1.0.0
- * @apiName GetNewsCommentsById
- * @apiGroup News
- * 
- * @apiParam {string} id News id
+ * @api {get} /news/:id/vote Request Get User Vote News
  *
- * @apiQuery {string} type News Comment Type (ex : 지도자, 예술가, 감시자 )
- * @apiQuery {number} page News Comments Page
- * @apiQuery {number} limit News Comments Limit
- * 
+ * @apiVersion        1.0.0
+ * @apiName PostNewsVote
+ * @apiGroup News
+ *
+ * @apiHeader {String} Authorization='Bearer ${string}'
+ *
+ * @apiParam {String} id News id
+ *
  * @apiSuccessExample Success-Response:
  *      HTTP/1.1 200 OK
  *      {
           "success": true,
           "result": {
-            comments: Array<{
-              title: string;
-              comment: string;
-            }>;
+            response : 'left' | 'right' | 'none',
+            vote : {
+              left : number,
+              right : number,
+              none : number
+            }
           }
         }
  */
 
 /**
- * @api {get} /news/:id/vote Request News Vote Result
+ * @api {post} /news/:id/vote Request Post News Vote Result
  *
  * @apiVersion        1.0.0
  * @apiName PostNewsUserVote
@@ -136,6 +136,8 @@
  * @apiHeader {String} Authorization='Bearer ${string}'
  *
  * @apiParam {String} id News id
+ *  
+ * @apiBody {string='left','right','none'} response User vote response "left" | "right" | "none" 
  * @apiSuccessExample Success-Response:
         HTTP/1.1 200 OK
         {
@@ -166,32 +168,6 @@
  *          "error" : 'error message"   
  *      }
  *     }
- */
-
-/**
- * @api {post} /news/:id/vote Request Post User Vote News
- *
- * @apiVersion        1.0.0
- * @apiName PostNewsVote
- * @apiGroup News
- *
- * @apiHeader {String} Authorization='Bearer ${string}'
- *
- * @apiParam {String} id News id
- *
-
- * @apiBody {string='left','right','none'} response User vote response "left" | "right" | "none" | null
- *
- * @apiSuccessExample Success-Response:
- *      HTTP/1.1 200 OK
- *      {
-          "success": true,
-          "result": {
-            left : number,
-            right : number,
-            none : number
-          }
-        }
  */
 
 /**
