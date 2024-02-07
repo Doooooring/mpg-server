@@ -169,10 +169,10 @@
  */
 
 /**
- * @api {post} /news/:id/vote Request User Vote News
+ * @api {post} /news/:id/vote Request Post User Vote News
  *
  * @apiVersion        1.0.0
- * @apiName GetNewsVote
+ * @apiName PostNewsVote
  * @apiGroup News
  *
  * @apiHeader {String} Authorization='Bearer ${string}'
@@ -180,7 +180,7 @@
  * @apiParam {String} id News id
  *
 
- * @apiBody {string='left','right','none',null} response User vote response "left" | "right" | "none" | null
+ * @apiBody {string='left','right','none'} response User vote response "left" | "right" | "none" | null
  *
  * @apiSuccessExample Success-Response:
  *      HTTP/1.1 200 OK
@@ -190,6 +190,26 @@
             left : number,
             right : number,
             none : number
+          }
+        }
+ */
+
+/**
+ * @api {delete} /news/:id/vote Request Delete User Vote News
+ *
+ * @apiVersion        1.0.0
+ * @apiName DeleteNewsVote
+ * @apiGroup News
+ *
+ * @apiHeader {String} Authorization='Bearer ${string}'
+ *
+ * @apiParam {String} id News id
+ * 
+ * @apiSuccessExample Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+          "success": true,
+          "result": {
           }
         }
  */
@@ -217,8 +237,9 @@
                       "title": "string",
                       "summary": "string",
                       "keywords": ["string"],
-                      "state": "boolean"
-                  
+                      "state": "boolean",
+                      "img" : "string",
+                      "lastTimelineDate" : "string"                  
                     }
                 ]
             }
