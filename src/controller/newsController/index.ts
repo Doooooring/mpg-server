@@ -2,13 +2,11 @@ import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import { News } from "../..//schemas/news";
-import { Platform } from "../../interface/common";
 import { NewsInf, commentType } from "../../interface/news";
-import { VoteInf } from "../../interface/vote";
-import { Vote } from "../../schemas/vote";
 import { keywordRepositories } from "../../service/keyword";
 import { newsRepositories } from "../../service/news";
-import { verifyYVoteToken } from "../../tools/auth";
+import { voteRepositories } from "../../service/vote";
+import { TokenPayload, verifyYVoteToken } from "../../tools/auth";
 import { clone } from "../../utils/common/index";
 import { updateKeywordsState } from "../keywordController";
 
@@ -152,62 +150,6 @@ export const getNewsTitle = async (req: Request, res: Response) => {
       result: {
         news: [],
       },
-    });
-  }
-};
-
-export const getNewsByIdWithVote = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.query;
-    const token = req.headers.authorization;
-    const response = await newsRepositories.getNewsById(id as string);
-    if (response === null) {
-      res.send({
-        success: false,
-        result: {},
-      });
-      return;
-    }
-    const contentToSend = clone(response) as any;
-    contentToSend.comments =
-      Object.keys((contentToSend as NewsInf)?.comments ?? {}) ?? [];
-
-    if (token === null) {
-      res.send({
-        success: true,
-        result: { response: null, news: contentToSend },
-      });
-    } else {
-      const user: VoteInf | null = await Vote.findOne({ user: token });
-      if (user === null) {
-        res.send({
-          success: true,
-          result: {
-            response: null,
-            news: contentToSend,
-          },
-        });
-      } else {
-        const userVote = user.vote;
-        const curNews = userVote.filter((comp) => {
-          return comp.news === id;
-        });
-
-        const response = curNews.length !== 0 ? curNews[0].response : null;
-        res.send({
-          success: true,
-          result: {
-            response: response,
-            news: contentToSend,
-          },
-        });
-      }
-    }
-  } catch (e) {
-    console.log(e);
-    res.send({
-      success: false,
-      result: {},
     });
   }
 };
@@ -510,20 +452,71 @@ export const updateNewsData = async (req: Request, res: Response) => {
 export const voteByNewsData = async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const token = req.headers.authorization;
-  const response = req.body.response as "left" | "right" | "none" | null;
+  const response = req.body.response as "left" | "right" | "none";
   try {
     const {
-      payload: { email, platform },
+      payload: { email },
     } = verifyYVoteToken(token as string) as {
       state: boolean;
-      payload: {
-        email: string;
-        platform: Platform;
-      };
+      payload: TokenPayload;
     };
 
-    const res = await newsRepositories.postVoteToNews(email, id, response);
-  } catch (e) {}
+    const prevVote = await voteRepositories.getVoteInfo({
+      user: email,
+      news: id,
+    });
+
+    if (!prevVote) {
+      const voteRes = await voteRepositories.postVoteToNews(
+        email,
+        id,
+        response
+      );
+    } else {
+      Error("VoteDuplicated");
+    }
+  } catch (e: any) {
+    if (e.message == "VoteDuplicated") {
+      res.status(400).send({
+        success: false,
+        result: {},
+      });
+    } else {
+      res.status(401).send({
+        success: false,
+        result: {
+          error: e,
+        },
+      });
+    }
+  }
+};
+
+export const deleteNewsVoteInfo = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const token = req.headers.authorization;
+  try {
+    const { state, payload } = verifyYVoteToken(token as string);
+    if (!state) {
+      Error("TokenNotValidated");
+      return;
+    }
+    const { email } = payload as TokenPayload;
+
+    await voteRepositories.deleteVote(email, id);
+
+    res.send({
+      state: true,
+      result: {},
+    });
+  } catch (e) {
+    res.status(401).send({
+      success: false,
+      result: {
+        error: e,
+      },
+    });
+  }
 };
 
 export const deleteNewsData = async (req: Request, res: Response) => {
@@ -578,3 +571,59 @@ export const deleteNewsAll = async (req: Request, res: Response) => {
     });
   }
 };
+
+// export const getNewsByIdWithVote = async (req: Request, res: Response) => {
+//   try {
+//     const { id } = req.query;
+//     const token = req.headers.authorization;
+//     const response = await newsRepositories.getNewsById(id as string);
+//     if (response === null) {
+//       res.send({
+//         success: false,
+//         result: {},
+//       });
+//       return;
+//     }
+//     const contentToSend = clone(response) as any;
+//     contentToSend.comments =
+//       Object.keys((contentToSend as NewsInf)?.comments ?? {}) ?? [];
+
+//     if (token === null) {
+//       res.send({
+//         success: true,
+//         result: { response: null, news: contentToSend },
+//       });
+//     } else {
+//       const user: VoteInf | null = await Vote.findOne({ user: token });
+//       if (user === null) {
+//         res.send({
+//           success: true,
+//           result: {
+//             response: null,
+//             news: contentToSend,
+//           },
+//         });
+//       } else {
+//         const userVote = user.vote;
+//         const curNews = userVote.filter((comp) => {
+//           return comp.news === id;
+//         });
+
+//         const response = curNews.length !== 0 ? curNews[0].response : null;
+//         res.send({
+//           success: true,
+//           result: {
+//             response: response,
+//             news: contentToSend,
+//           },
+//         });
+//       }
+//     }
+//   } catch (e) {
+//     console.log(e);
+//     res.send({
+//       success: false,
+//       result: {},
+//     });
+//   }
+// };

@@ -119,6 +119,12 @@ class NewsRepositories {
               in: { $ifNull: ["$$lastTimelineEntry.date", "0000.00"] },
             },
           },
+          img: {
+            $concat: [
+              "https://api.yvoting.com/images/news/",
+              { $toString: "$_id" }, // Convert ObjectId to string
+            ],
+          },
         },
       },
       {
@@ -131,6 +137,8 @@ class NewsRepositories {
           summary: 1,
           keywords: 1,
           state: 1,
+          lastTimelineDate: 1,
+          img: 1,
         },
       },
       {
@@ -221,12 +229,6 @@ class NewsRepositories {
       news
     );
   };
-
-  postVoteToNews = async (
-    user: string,
-    news: string,
-    response: "left" | "right" | "none" | null
-  ) => {};
 
   pushKeywordToNews = async (news: string[], keyword: string) => {
     const newsIdList = news.map((id) => {

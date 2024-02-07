@@ -4,6 +4,11 @@ import { Platform } from "../interface/common";
 const ACCESS_SECRET = "YVOTEAccEsSecret";
 const REFRESH_SECRET = "YVOTERefrESHSecret";
 
+export interface TokenPayload {
+  email: string;
+  platform: Platform;
+}
+
 export const issueYVoteToken = (email: string, platform: Platform) => {
   const payload = {
     email,
@@ -24,10 +29,7 @@ export const verifyYVoteToken = (token: string) => {
 
     return {
       state: true,
-      payload: data as {
-        email: string;
-        platform: Platform;
-      },
+      payload: data as TokenPayload,
     };
   } catch (e) {
     return {
@@ -42,7 +44,6 @@ export const issueRefreshToken = (email: string, platform: Platform) => {
     algorithm: "HS256",
     expiresIn: 60 * 60 * 24 * 30 * 6, //refresh 6 month
     issuer: "yVote",
-
   });
   return refreshToken;
 };
@@ -52,10 +53,7 @@ export const veriyRefreshToken = (token: string) => {
     const data = jwt.verify(token, REFRESH_SECRET);
     return {
       state: true,
-      payload: data as {
-        email: string;
-        platform: Platform;
-      },
+      payload: data as TokenPayload,
     };
   } catch (e) {
     return {
