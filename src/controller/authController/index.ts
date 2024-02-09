@@ -11,6 +11,27 @@ import {
 } from "../../tools/auth";
 import { upsertUsers } from "./auth.tools";
 
+export const adminLogin = async (req: Request, res: Response) => {
+  const admin = {
+    email: "admin",
+    name: "admin",
+    platform: Platform.ADMIN,
+  };
+
+  const yVoteToken = issueYVoteToken(admin.email, Platform.ADMIN);
+  const refreshToken = issueRefreshToken(admin.email, Platform.ADMIN);
+
+  res.send({
+    success: true,
+    result: {
+      access: yVoteToken,
+      refresh: refreshToken,
+      name: admin.email,
+      email: admin.name,
+    },
+  });
+};
+
 export const kakaoLogin = async (req: Request, res: Response) => {
   try {
     const token = req.headers.authorization;
@@ -162,7 +183,7 @@ export const auth = (req: Request, res: Response, next: any) => {
     }
     next();
   } catch (e: any) {
-    if (e.name === "TokenExpiredError") {
+    if (e === "TokenExpiredError") {
       return res.status(419).send({
         success: false,
         result: {
@@ -171,7 +192,7 @@ export const auth = (req: Request, res: Response, next: any) => {
       });
     }
     // 토큰의 비밀키가 일치하지 않는 경우
-    if (e.name === "JsonWebTokenError") {
+    if (e === "JsonWebTokenError") {
       return res.status(401).json({
         success: false,
         result: {

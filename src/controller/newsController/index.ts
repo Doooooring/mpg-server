@@ -9,6 +9,7 @@ import { voteRepositories } from "../../service/vote";
 import { TokenPayload, verifyYVoteToken } from "../../tools/auth";
 import { clone } from "../../utils/common/index";
 import { updateKeywordsState } from "../keywordController";
+import { getVoteCountByNewsId } from "./votet.tools";
 
 export const getNewsIds = async (req: Request, res: Response) => {
   const response = await newsRepositories.getNewsIds();
@@ -166,7 +167,8 @@ export const getNewsByKeyword = async (req: Request, res: Response) => {
         news: response,
       },
     });
-  } catch {
+  } catch (e) {
+    console.log("Get News By Keyword Error : ", e);
     res.send({
       success: false,
       result: {
@@ -197,8 +199,8 @@ export const setKeywordsById = async (req: Request, res: Response) => {
       },
     });
   } catch (e) {
-    console.error(e);
-    res.send({
+    console.error("Set Keywords by Id error : ", e);
+    res.status(500).send({
       success: false,
       result: {
         news: [],
@@ -240,11 +242,13 @@ export const updateKeywordsById = async (req: Request, res: Response) => {
       });
     }
   } catch (e) {
-    res.send({
+    console.error("update Keywords by id error : ", e);
+    res.status(500).send({
       success: false,
-      result: {},
+      result: {
+        error: e,
+      },
     });
-    console.error(e);
   }
 };
 
@@ -279,8 +283,8 @@ export const getNewsComment = async (req: Request, res: Response) => {
       });
     }
   } catch (e) {
-    console.log(e);
-    res.send({
+    console.log("Get News comment error : ", e);
+    res.status(500).send({
       success: false,
       result: {},
     });
@@ -327,8 +331,8 @@ export const addNewsData = async (req: Request, res: Response) => {
       result: {},
     });
   } catch (e) {
-    console.log(e);
-    res.send({
+    console.log("Add News Data Error : ", e);
+    res.status(500).send({
       success: false,
       result: {},
     });
@@ -343,7 +347,6 @@ export const postNewsImageById = async (req: Request, res: Response) => {
       return;
     }
     const id = req.params.id;
-    console.log(img);
 
     // let buffer = Buffer.from(img, "base64");
     const filePath = path.join(__dirname, "../../images/news", id);
@@ -355,11 +358,10 @@ export const postNewsImageById = async (req: Request, res: Response) => {
     });
   } catch (e) {
     console.log(e);
-    res.send({
+    res.status(500).send({
       success: false,
       result: {},
     });
-    return;
   }
 };
 
@@ -441,11 +443,58 @@ export const updateNewsData = async (req: Request, res: Response) => {
       }
     }
   } catch (e) {
-    console.log(e);
-    res.send({
+    console.log("Update News Error : ", e);
+    res.status(500).send({
       success: false,
       result: {},
     });
+  }
+};
+
+export const getVoteInfoByNewsId = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const token = req.headers.authorization;
+  try {
+    const { payload } = verifyYVoteToken(token as string) as {
+      state: boolean;
+      payload: TokenPayload;
+    };
+    const { email } = payload as TokenPayload;
+    const prevVote = await voteRepositories.getVoteInfo({
+      user: email,
+      news: id,
+    });
+
+    if (!prevVote) {
+      Error("VoteInfoNotExisted");
+      return;
+    }
+
+    const response = prevVote.response;
+    const voteCnt = await getVoteCountByNewsId(id);
+
+    res.send({
+      success: true,
+      result: {
+        response,
+        vote: voteCnt,
+      },
+    });
+  } catch (e: any) {
+    if (e == "VoteInfoNotExisted") {
+      res.status(401).send({
+        result: {
+          error: e,
+        },
+      });
+    } else {
+      res.status(500).send({
+        success: false,
+        result: {
+          error: e,
+        },
+      });
+    }
   }
 };
 
@@ -472,11 +521,20 @@ export const voteByNewsData = async (req: Request, res: Response) => {
         id,
         response
       );
+
+      const voteCnt = await getVoteCountByNewsId(id);
+
+      res.send({
+        success: true,
+        result: {
+          ...voteCnt,
+        },
+      });
     } else {
       Error("VoteDuplicated");
     }
   } catch (e: any) {
-    if (e.message == "VoteDuplicated") {
+    if (e == "VoteDuplicated") {
       res.status(400).send({
         success: false,
         result: {},
@@ -509,13 +567,22 @@ export const deleteNewsVoteInfo = async (req: Request, res: Response) => {
       state: true,
       result: {},
     });
-  } catch (e) {
-    res.status(401).send({
-      success: false,
-      result: {
-        error: e,
-      },
-    });
+  } catch (e: any) {
+    if (e == "TokenNotValidated") {
+      res.status(401).send({
+        success: false,
+        result: {
+          error: e,
+        },
+      });
+    } else {
+      res.status(500).send({
+        success: false,
+        result: {
+          error: e,
+        },
+      });
+    }
   }
 };
 
@@ -549,7 +616,7 @@ export const deleteNewsData = async (req: Request, res: Response) => {
       result: {},
     });
   } catch {
-    res.send({
+    res.status(500).send({
       success: false,
       result: {},
     });
@@ -565,7 +632,7 @@ export const deleteNewsAll = async (req: Request, res: Response) => {
     });
     return;
   } catch (e) {
-    res.send({
+    res.status(500).send({
       success: false,
       result: {},
     });

@@ -4,7 +4,7 @@ import { Vote } from "../../schemas/vote";
 const ObjectId = mongoose.Types.ObjectId;
 
 class VoteRepositories {
-  getVoteCount = async (news: string) => {
+  getVoteCount = async (news: string, response: "left" | "right" | "none") => {
     return Vote.countDocuments({
       news,
     });
