@@ -9,34 +9,46 @@ import {
   verifyYVoteToken,
   veriyRefreshToken,
 } from "../../tools/auth";
-import { upsertUsers } from "./auth.tools";
+import { bearerParse } from "../../utils/common";
+import { upsertUser } from "./auth.tools";
 
 export const adminLogin = async (req: Request, res: Response) => {
-  const admin = {
-    email: "admin",
-    name: "admin",
-    platform: Platform.ADMIN,
-  };
+  try {
+    const { email, name } = req.body;
+    const admin = {
+      email,
+      name,
+      platform: Platform.ADMIN,
+    };
 
-  const yVoteToken = issueYVoteToken(admin.email, Platform.ADMIN);
-  const refreshToken = issueRefreshToken(admin.email, Platform.ADMIN);
+    const yVoteToken = issueYVoteToken(admin.email, Platform.ADMIN);
+    const refreshToken = issueRefreshToken(admin.email, Platform.ADMIN);
 
-  res.send({
-    success: true,
-    result: {
-      access: yVoteToken,
-      refresh: refreshToken,
-      name: admin.email,
-      email: admin.name,
-    },
-  });
+    await upsertUser(email, name, Platform.ADMIN);
+
+    res.send({
+      success: true,
+      result: {
+        access: yVoteToken,
+        refresh: refreshToken,
+        name: admin.email,
+        email: admin.name,
+      },
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(401).send({
+      success: false,
+      result: e,
+    });
+  }
 };
 
 export const kakaoLogin = async (req: Request, res: Response) => {
   try {
-    const token = req.headers.authorization;
+    const auth = req.headers.authorization;
 
-    if (!token) {
+    if (!auth) {
       Error("User token is not defined");
       return;
     }
@@ -47,11 +59,12 @@ export const kakaoLogin = async (req: Request, res: Response) => {
       "kakao_account.profile",
     ];
 
+    const token = bearerParse(auth);
     const data = await kakaoRepositories.getUserInfoByToken(token, properties);
 
     const { name, email } = data.kakao_account;
 
-    upsertUsers(email, name, Platform.KAKAO);
+    await upsertUser(email, name, Platform.KAKAO);
 
     const yVoteToken = issueYVoteToken(email, Platform.KAKAO);
     const refreshToken = issueRefreshToken(email, Platform.KAKAO);
@@ -73,18 +86,20 @@ export const kakaoLogin = async (req: Request, res: Response) => {
 
 export const googleLogin = async (req: Request, res: Response) => {
   try {
-    const token = req.headers.authorization;
+    const auth = req.headers.authorization;
 
-    if (!token) {
+    if (!auth) {
       Error("User token is not defined");
       return;
     }
+
+    const token = bearerParse(auth);
 
     const data = await googleRepositories.getUserInfoByToken(token);
 
     const { name, email } = data;
 
-    upsertUsers(email, name, Platform.GOOGLE);
+    await upsertUser(email, name, Platform.GOOGLE);
 
     const yVoteToken = issueYVoteToken(email, Platform.GOOGLE);
     const refreshToken = issueRefreshToken(email, Platform.GOOGLE);
@@ -136,11 +151,13 @@ export const logout = (req: Request, res: Response) => {
 
 export const tokenRefresh = (req: Request, res: Response) => {
   try {
-    const token = req.headers.authorization;
-    if (!token) {
+    const auth = req.headers.authorization;
+    if (!auth) {
       Error("User token is not defined");
       return;
     }
+
+    const token = bearerParse(auth);
     const response = veriyRefreshToken(token as string);
     if (!response.state) {
       Error("Refresh Expired");
@@ -171,20 +188,22 @@ export const tokenRefresh = (req: Request, res: Response) => {
 
 export const auth = (req: Request, res: Response, next: any) => {
   try {
-    const token = req.headers.authorization;
-    if (!token) {
+    const auth = req.headers.authorization;
+    if (!auth) {
       Error("TokenExpiredError");
       return;
     }
 
+    const token = bearerParse(auth);
     const { state, payload } = verifyYVoteToken(token);
+
     if (!state) {
-      Error("JsonWebTokenError");
+      throw new Error("JsonWebTokenError");
     }
     next();
   } catch (e: any) {
-    if (e === "TokenExpiredError") {
-      return res.status(419).send({
+    if (e.message === "TokenExpiredError") {
+      res.status(419).send({
         success: false,
         result: {
           message: "토큰이 만료되었습니다.",
@@ -192,13 +211,18 @@ export const auth = (req: Request, res: Response, next: any) => {
       });
     }
     // 토큰의 비밀키가 일치하지 않는 경우
-    if (e === "JsonWebTokenError") {
-      return res.status(401).json({
+    if (e.message === "JsonWebTokenError") {
+      res.status(401).send({
         success: false,
         result: {
           message: "유효하지 않은 토큰입니다.",
         },
       });
     }
+
+    res.status(401).send({
+      success: false,
+      result: e,
+    });
   }
 };

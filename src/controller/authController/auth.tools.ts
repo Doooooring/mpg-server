@@ -1,16 +1,17 @@
 import { Platform } from "../../interface/common";
 import { userRepositories } from "../../service/user";
 
-export const upsertUsers = async (
+export const upsertUser = async (
   email: string,
   name: string,
   platform: Platform
 ) => {
   try {
-    const user = userRepositories.getUserInfoByEmailAndPlatform(
+    const user = await userRepositories.getUserInfoByEmailAndPlatform(
       email,
       platform
     );
+
     if (!user) {
       const response = await userRepositories.postUser(email, name, platform);
     }

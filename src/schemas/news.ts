@@ -49,83 +49,8 @@ newsSchema.virtual("lastTimelineDate").get(function () {
   return lastTimelineEntry ? lastTimelineEntry.date : "0000.00";
 });
 
-export const News = mongoose.model<NewsInf>("News", newsSchema);
+newsSchema.index({
+  
+})
 
-// [commentType.감시자]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.개혁가]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.공화주의자]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.관찰자]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.국민의힘]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.민주당]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.예술가]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.운영자]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.이론가]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.자유주의자]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.지도자]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.전략가]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
-// [commentType.청와대]: [
-//   {
-//     title: String,
-//     comment: String,
-//   },
-// ],
+export const News = mongoose.model<NewsInf>("News", newsSchema);

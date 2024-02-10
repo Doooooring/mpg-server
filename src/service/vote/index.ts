@@ -7,6 +7,7 @@ class VoteRepositories {
   getVoteCount = async (news: string, response: "left" | "right" | "none") => {
     return Vote.countDocuments({
       news,
+      response: response,
     });
   };
 

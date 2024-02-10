@@ -12,7 +12,7 @@ class UserRepositories {
   };
 
   getUserInfoByEmailAndPlatform = async (email: string, platform: Platform) => {
-    return User.find({
+    return User.findOne({
       email,
       platform,
     });

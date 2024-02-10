@@ -7,7 +7,7 @@ import { keywordRepositories } from "../../service/keyword";
 import { newsRepositories } from "../../service/news";
 import { voteRepositories } from "../../service/vote";
 import { TokenPayload, verifyYVoteToken } from "../../tools/auth";
-import { clone } from "../../utils/common/index";
+import { bearerParse, clone } from "../../utils/common/index";
 import { updateKeywordsState } from "../keywordController";
 import { getVoteCountByNewsId } from "./votet.tools";
 
@@ -298,11 +298,6 @@ export const addNewsData = async (req: Request, res: Response) => {
 
     const news: NewsInf = {
       order: maxOrder + 1,
-      votes: {
-        left: 0,
-        right: 0,
-        none: 0,
-      },
       ...req.body.news,
     };
 
@@ -453,8 +448,9 @@ export const updateNewsData = async (req: Request, res: Response) => {
 
 export const getVoteInfoByNewsId = async (req: Request, res: Response) => {
   const id = req.params.id as string;
-  const token = req.headers.authorization;
+  const auth = req.headers.authorization;
   try {
+    const token = bearerParse(auth!);
     const { payload } = verifyYVoteToken(token as string) as {
       state: boolean;
       payload: TokenPayload;
@@ -466,8 +462,7 @@ export const getVoteInfoByNewsId = async (req: Request, res: Response) => {
     });
 
     if (!prevVote) {
-      Error("VoteInfoNotExisted");
-      return;
+      throw new Error("VoteInfoNotExisted");
     }
 
     const response = prevVote.response;
@@ -484,14 +479,14 @@ export const getVoteInfoByNewsId = async (req: Request, res: Response) => {
     if (e == "VoteInfoNotExisted") {
       res.status(401).send({
         result: {
-          error: e,
+          error: e.message,
         },
       });
     } else {
       res.status(500).send({
         success: false,
         result: {
-          error: e,
+          error: e.message,
         },
       });
     }
@@ -500,10 +495,12 @@ export const getVoteInfoByNewsId = async (req: Request, res: Response) => {
 
 export const voteByNewsData = async (req: Request, res: Response) => {
   const id = req.params.id as string;
-  const token = req.headers.authorization;
+  const auth = req.headers.authorization;
   const response = req.body.response as "left" | "right" | "none";
   try {
+    const token = bearerParse(auth!);
     const {
+      state,
       payload: { email },
     } = verifyYVoteToken(token as string) as {
       state: boolean;
@@ -531,9 +528,10 @@ export const voteByNewsData = async (req: Request, res: Response) => {
         },
       });
     } else {
-      Error("VoteDuplicated");
+      throw new Error("VoteDuplicated");
     }
   } catch (e: any) {
+    console.log("Vote By News Id error : ", e);
     if (e == "VoteDuplicated") {
       res.status(400).send({
         success: false,
@@ -542,9 +540,7 @@ export const voteByNewsData = async (req: Request, res: Response) => {
     } else {
       res.status(401).send({
         success: false,
-        result: {
-          error: e,
-        },
+        result: e,
       });
     }
   }
@@ -552,12 +548,12 @@ export const voteByNewsData = async (req: Request, res: Response) => {
 
 export const deleteNewsVoteInfo = async (req: Request, res: Response) => {
   const id = req.params.id as string;
-  const token = req.headers.authorization;
+  const auth = req.headers.authorization;
   try {
+    const token = bearerParse(auth!);
     const { state, payload } = verifyYVoteToken(token as string);
     if (!state) {
-      Error("TokenNotValidated");
-      return;
+      throw new Error("TokenNotValidated");
     }
     const { email } = payload as TokenPayload;
 
@@ -593,12 +589,7 @@ export const deleteNewsData = async (req: Request, res: Response) => {
     const curNews = await newsRepositories.getNewsById(id as string);
 
     if (curNews === null) {
-      Error("news not exist");
-      res.send({
-        success: false,
-        result: {},
-      });
-      return;
+      throw new Error("news not exist");
     }
 
     const curKeywords = curNews!["keywords"];

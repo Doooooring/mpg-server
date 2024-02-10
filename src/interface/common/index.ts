@@ -1,5 +1,5 @@
 export enum Platform {
-  KAKAO,
-  GOOGLE,
-  ADMIN,
+  KAKAO = "KAKAO",
+  GOOGLE = "GOOGLE",
+  ADMIN = "ADMIN",
 }
