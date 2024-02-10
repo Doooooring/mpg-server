@@ -374,7 +374,7 @@ export const addNewsData = async (req: Request, res: Response) => {
       const keywordResponse2 = await keywordRepositories.updateNewsInfoAndState(
         keywordList,
         true,
-        JSON.stringify(response["_id"])
+        response["_id"].toString()
       );
     }
 
