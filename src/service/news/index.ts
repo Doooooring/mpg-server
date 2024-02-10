@@ -119,6 +119,12 @@ class NewsRepositories {
               in: { $ifNull: ["$$lastTimelineEntry.date", "0000.00"] },
             },
           },
+          img: {
+            $concat: [
+              "https://api.yvoting.com/images/news/",
+              { $toString: "$_id" }, // Convert ObjectId to string
+            ],
+          },
         },
       },
       {
@@ -131,6 +137,8 @@ class NewsRepositories {
           summary: 1,
           keywords: 1,
           state: 1,
+          lastTimelineDate: 1,
+          img: 1,
         },
       },
       {
@@ -222,14 +230,6 @@ class NewsRepositories {
     );
   };
 
-  deleteNewsById = async (id: string) => {
-    const idParsed = id.replace(/"/g, "");
-    const _id = new ObjectId(idParsed);
-    return News.deleteOne({
-      _id: _id,
-    });
-  };
-
   pushKeywordToNews = async (news: string[], keyword: string) => {
     const newsIdList = news.map((id) => {
       const idParsed = id.replace(/"/g, "");
@@ -245,6 +245,7 @@ class NewsRepositories {
       }
     );
   };
+
   pullKeywordFromNews = async (news: string[], keyword: string) => {
     const newsIdList = news.map((id) => {
       const idParsed = id.replace(/"/g, "");
@@ -259,6 +260,13 @@ class NewsRepositories {
         },
       }
     );
+  };
+
+  deleteNewsById = async (id: string) => {
+    const _id = new ObjectId(id);
+    return News.deleteOne({
+      _id: _id,
+    });
   };
 }
 

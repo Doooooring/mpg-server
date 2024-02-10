@@ -16,4 +16,14 @@ const voteSchema = new Schema(
   }
 );
 
+voteSchema.index({
+  news: 1,
+  response: 1,
+});
+
+voteSchema.index({
+  user: 1,
+  news: 1,
+});
+
 export const Vote = mongoose.model("Vote", voteSchema);

@@ -1,15 +1,18 @@
 import express, { Request, Response } from "express";
+import { auth } from "../controller/authController";
 import {
   addNewsData,
+  deleteNewsVoteInfo,
   getNewsByIdClient,
-  getNewsByIdWithVote,
   getNewsByKeyword,
   getNewsComment,
   getNewsIds,
   getNewsPreviewList,
+  getVoteInfoByNewsId,
   setKeywordsById,
   updateKeywordsById,
   updateNewsData,
+  voteByNewsData,
 } from "../controller/newsController";
 import { News } from "../schemas/news";
 
@@ -32,7 +35,7 @@ router
   .patch(updateKeywordsById);
 
 // 기사 상세 (deprecate)
-router.route("/detail").get(getNewsByIdWithVote).patch();
+// router.route("/detail").get(getNewsByIdWithVote).patch();
 
 // 기사 목록
 router.route("/preview").get(getNewsPreviewList);
@@ -42,9 +45,11 @@ router.route("/:id").get(getNewsByIdClient);
 
 // 기사 comment
 router.route("/:id/comment").get(getNewsComment);
-
-router.route("/:id/vote").get().post();
-
+router
+  .route("/:id/vote")
+  .get(auth, getVoteInfoByNewsId)
+  .post(auth, voteByNewsData)
+  .delete(auth, deleteNewsVoteInfo);
 // 기사 등록
 router.route("/").get().post(addNewsData).patch(updateNewsData);
 

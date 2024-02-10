@@ -4,7 +4,6 @@ import express, { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 
-import { apiRoute } from "./routes/api";
 import { authRoute } from "./routes/auth";
 import { keywordRoute } from "./routes/keywords";
 import { keywordAdminRoute } from "./routes/keywordsAdmin";
@@ -69,14 +68,19 @@ app.use(
 );
 
 //repository router
-app.use("/api", apiRoute);
+// app.use("/api", apiRoute);
+
 app.use("/news", newsRoute);
 app.use("/keywords", keywordRoute);
+
 app.use("/user", userRoute);
 app.use("/auth", authRoute);
+
+app.use("/vote", voteRoute);
+
 app.use("/admin/news", newsAdminRoute);
 app.use("/admin/keywords", keywordAdminRoute);
-app.use("/vote", voteRoute);
+
 
 app.use("*", (req: Request, res: Response) => {
   res.send("not existing paths");

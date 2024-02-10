@@ -3,12 +3,13 @@ import fs from "fs";
 import path from "path";
 import { News } from "../..//schemas/news";
 import { NewsInf, commentType } from "../../interface/news";
-import { VoteInf } from "../../interface/vote";
-import { Vote } from "../../schemas/vote";
 import { keywordRepositories } from "../../service/keyword";
 import { newsRepositories } from "../../service/news";
-import { clone } from "../../utils/common/index";
+import { voteRepositories } from "../../service/vote";
+import { TokenPayload, verifyYVoteToken } from "../../tools/auth";
+import { bearerParse, clone } from "../../utils/common/index";
 import { updateKeywordsState } from "../keywordController";
+import { getVoteCountByNewsId } from "./votet.tools";
 
 export const getNewsIds = async (req: Request, res: Response) => {
   const response = await newsRepositories.getNewsIds();
@@ -74,7 +75,7 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
         },
       });
     } catch (err) {
-      res.send({
+      res.status(500).send({
         success: false,
         result: {
           news: [],
@@ -154,62 +155,6 @@ export const getNewsTitle = async (req: Request, res: Response) => {
   }
 };
 
-export const getNewsByIdWithVote = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.query;
-    const token = req.headers.authorization;
-    const response = await newsRepositories.getNewsById(id as string);
-    if (response === null) {
-      res.send({
-        success: false,
-        result: {},
-      });
-      return;
-    }
-    const contentToSend = clone(response) as any;
-    contentToSend.comments =
-      Object.keys((contentToSend as NewsInf)?.comments ?? {}) ?? [];
-
-    if (token === null) {
-      res.send({
-        success: true,
-        result: { response: null, news: contentToSend },
-      });
-    } else {
-      const user: VoteInf | null = await Vote.findOne({ user: token });
-      if (user === null) {
-        res.send({
-          success: true,
-          result: {
-            response: null,
-            news: contentToSend,
-          },
-        });
-      } else {
-        const userVote = user.vote;
-        const curNews = userVote.filter((comp) => {
-          return comp.news === id;
-        });
-
-        const response = curNews.length !== 0 ? curNews[0].response : null;
-        res.send({
-          success: true,
-          result: {
-            response: response,
-            news: contentToSend,
-          },
-        });
-      }
-    }
-  } catch (e) {
-    console.log(e);
-    res.send({
-      success: false,
-      result: {},
-    });
-  }
-};
-
 export const getNewsByKeyword = async (req: Request, res: Response) => {
   const { keyword } = req.params;
   try {
@@ -222,7 +167,8 @@ export const getNewsByKeyword = async (req: Request, res: Response) => {
         news: response,
       },
     });
-  } catch {
+  } catch (e) {
+    console.log("Get News By Keyword Error : ", e);
     res.send({
       success: false,
       result: {
@@ -253,8 +199,8 @@ export const setKeywordsById = async (req: Request, res: Response) => {
       },
     });
   } catch (e) {
-    console.error(e);
-    res.send({
+    console.error("Set Keywords by Id error : ", e);
+    res.status(500).send({
       success: false,
       result: {
         news: [],
@@ -296,11 +242,13 @@ export const updateKeywordsById = async (req: Request, res: Response) => {
       });
     }
   } catch (e) {
-    res.send({
+    console.error("update Keywords by id error : ", e);
+    res.status(500).send({
       success: false,
-      result: {},
+      result: {
+        error: e,
+      },
     });
-    console.error(e);
   }
 };
 
@@ -335,8 +283,8 @@ export const getNewsComment = async (req: Request, res: Response) => {
       });
     }
   } catch (e) {
-    console.log(e);
-    res.send({
+    console.log("Get News comment error : ", e);
+    res.status(500).send({
       success: false,
       result: {},
     });
@@ -350,11 +298,6 @@ export const addNewsData = async (req: Request, res: Response) => {
 
     const news: NewsInf = {
       order: maxOrder + 1,
-      votes: {
-        left: 0,
-        right: 0,
-        none: 0,
-      },
       ...req.body.news,
     };
 
@@ -383,8 +326,8 @@ export const addNewsData = async (req: Request, res: Response) => {
       result: {},
     });
   } catch (e) {
-    console.log(e);
-    res.send({
+    console.log("Add News Data Error : ", e);
+    res.status(500).send({
       success: false,
       result: {},
     });
@@ -399,7 +342,6 @@ export const postNewsImageById = async (req: Request, res: Response) => {
       return;
     }
     const id = req.params.id;
-    console.log(img);
 
     // let buffer = Buffer.from(img, "base64");
     const filePath = path.join(__dirname, "../../images/news", id);
@@ -411,11 +353,10 @@ export const postNewsImageById = async (req: Request, res: Response) => {
     });
   } catch (e) {
     console.log(e);
-    res.send({
+    res.status(500).send({
       success: false,
       result: {},
     });
-    return;
   }
 };
 
@@ -497,11 +438,147 @@ export const updateNewsData = async (req: Request, res: Response) => {
       }
     }
   } catch (e) {
-    console.log(e);
-    res.send({
+    console.log("Update News Error : ", e);
+    res.status(500).send({
       success: false,
       result: {},
     });
+  }
+};
+
+export const getVoteInfoByNewsId = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const auth = req.headers.authorization;
+  try {
+    const token = bearerParse(auth!);
+    const { payload } = verifyYVoteToken(token as string) as {
+      state: boolean;
+      payload: TokenPayload;
+    };
+    const { email } = payload as TokenPayload;
+    const prevVote = await voteRepositories.getVoteInfo({
+      user: email,
+      news: id,
+    });
+
+    if (!prevVote) {
+      throw new Error("VoteInfoNotExisted");
+    }
+
+    const response = prevVote.response;
+    const voteCnt = await getVoteCountByNewsId(id);
+
+    res.send({
+      success: true,
+      result: {
+        response,
+        vote: voteCnt,
+      },
+    });
+  } catch (e: any) {
+    if (e == "VoteInfoNotExisted") {
+      res.status(401).send({
+        result: {
+          error: e.message,
+        },
+      });
+    } else {
+      res.status(500).send({
+        success: false,
+        result: {
+          error: e.message,
+        },
+      });
+    }
+  }
+};
+
+export const voteByNewsData = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const auth = req.headers.authorization;
+  const response = req.body.response as "left" | "right" | "none";
+  try {
+    const token = bearerParse(auth!);
+    const {
+      state,
+      payload: { email },
+    } = verifyYVoteToken(token as string) as {
+      state: boolean;
+      payload: TokenPayload;
+    };
+
+    const prevVote = await voteRepositories.getVoteInfo({
+      user: email,
+      news: id,
+    });
+
+    if (!prevVote) {
+      const voteRes = await voteRepositories.postVoteToNews(
+        email,
+        id,
+        response
+      );
+
+      const voteCnt = await getVoteCountByNewsId(id);
+
+      res.send({
+        success: true,
+        result: {
+          ...voteCnt,
+        },
+      });
+    } else {
+      throw new Error("VoteDuplicated");
+    }
+  } catch (e: any) {
+    console.log("Vote By News Id error : ", e);
+    if (e == "VoteDuplicated") {
+      res.status(400).send({
+        success: false,
+        result: {},
+      });
+    } else {
+      res.status(401).send({
+        success: false,
+        result: e,
+      });
+    }
+  }
+};
+
+export const deleteNewsVoteInfo = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+  const auth = req.headers.authorization;
+  try {
+    const token = bearerParse(auth!);
+    const { state, payload } = verifyYVoteToken(token as string);
+    if (!state) {
+      throw new Error("TokenNotValidated");
+    }
+    const { email } = payload as TokenPayload;
+
+    await voteRepositories.deleteVote(email, id);
+
+    res.send({
+      state: true,
+      result: {},
+    });
+  } catch (e: any) {
+    if (e == "TokenNotValidated") {
+      res.status(401).send({
+        success: false,
+        result: {
+          error: e,
+        },
+      });
+    } else {
+      res.status(500).send({
+        success: false,
+        result: {
+          error: e,
+        },
+      });
+    }
   }
 };
 
@@ -512,12 +589,7 @@ export const deleteNewsData = async (req: Request, res: Response) => {
     const curNews = await newsRepositories.getNewsById(id as string);
 
     if (curNews === null) {
-      Error("news not exist");
-      res.send({
-        success: false,
-        result: {},
-      });
-      return;
+      throw new Error("news not exist");
     }
 
     const curKeywords = curNews!["keywords"];
@@ -535,7 +607,7 @@ export const deleteNewsData = async (req: Request, res: Response) => {
       result: {},
     });
   } catch {
-    res.send({
+    res.status(500).send({
       success: false,
       result: {},
     });
@@ -551,9 +623,65 @@ export const deleteNewsAll = async (req: Request, res: Response) => {
     });
     return;
   } catch (e) {
-    res.send({
+    res.status(500).send({
       success: false,
       result: {},
     });
   }
 };
+
+// export const getNewsByIdWithVote = async (req: Request, res: Response) => {
+//   try {
+//     const { id } = req.query;
+//     const token = req.headers.authorization;
+//     const response = await newsRepositories.getNewsById(id as string);
+//     if (response === null) {
+//       res.send({
+//         success: false,
+//         result: {},
+//       });
+//       return;
+//     }
+//     const contentToSend = clone(response) as any;
+//     contentToSend.comments =
+//       Object.keys((contentToSend as NewsInf)?.comments ?? {}) ?? [];
+
+//     if (token === null) {
+//       res.send({
+//         success: true,
+//         result: { response: null, news: contentToSend },
+//       });
+//     } else {
+//       const user: VoteInf | null = await Vote.findOne({ user: token });
+//       if (user === null) {
+//         res.send({
+//           success: true,
+//           result: {
+//             response: null,
+//             news: contentToSend,
+//           },
+//         });
+//       } else {
+//         const userVote = user.vote;
+//         const curNews = userVote.filter((comp) => {
+//           return comp.news === id;
+//         });
+
+//         const response = curNews.length !== 0 ? curNews[0].response : null;
+//         res.send({
+//           success: true,
+//           result: {
+//             response: response,
+//             news: contentToSend,
+//           },
+//         });
+//       }
+//     }
+//   } catch (e) {
+//     console.log(e);
+//     res.send({
+//       success: false,
+//       result: {},
+//     });
+//   }
+// };
