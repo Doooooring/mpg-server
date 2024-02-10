@@ -49,8 +49,7 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     const auth = req.headers.authorization;
 
     if (!auth) {
-      Error("User token is not defined");
-      return;
+      throw new Error("User token is not defined");
     }
 
     const properties = [
@@ -80,7 +79,11 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     });
   } catch (e) {
     console.log("kakao login error", e);
-    res.send(e);
+
+    res.status(401).send({
+      success: false,
+      result: e,
+    });
   }
 };
 
@@ -89,8 +92,7 @@ export const googleLogin = async (req: Request, res: Response) => {
     const auth = req.headers.authorization;
 
     if (!auth) {
-      Error("User token is not defined");
-      return;
+      throw new Error("User token is not defined");
     }
 
     const token = bearerParse(auth);
@@ -114,8 +116,11 @@ export const googleLogin = async (req: Request, res: Response) => {
       },
     });
   } catch (e) {
-    console.log("kakao login error", e);
-    res.send(e);
+    console.log("google login error", e);
+    res.status(401).send({
+      success: false,
+      result: e,
+    });
   }
 };
 
@@ -179,9 +184,7 @@ export const tokenRefresh = (req: Request, res: Response) => {
   } catch (e) {
     res.status(401).send({
       state: false,
-      result: {
-        error: e,
-      },
+      result: e,
     });
   }
 };
