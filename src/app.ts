@@ -4,6 +4,7 @@ import express, { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 
+import { fixTheKeywords } from "./controller/keywordController";
 import { apiRoute } from "./routes/api";
 import { authRoute } from "./routes/auth";
 import { keywordRoute } from "./routes/keywords";
@@ -86,4 +87,4 @@ app.listen(app.get("port"), () => {
   console.log(app.get("port"), "번 포트에서 대기중");
 });
 
-// fixTheKeywords();
+fixTheKeywords();

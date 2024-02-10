@@ -397,7 +397,7 @@ export const fixTheKeywords = async () => {
   try {
     const keywords = await keywordRepositories.getKeywordsAll();
     for (let k of keywords) {
-      const { _id, news } = k as {
+      const { _id, keyword, news } = k as {
         _id: ObjectId;
         keyword: string;
         explain: string;
@@ -410,7 +410,8 @@ export const fixTheKeywords = async () => {
         newArr.push(news.replace(/"/g, ""));
       });
       k.news = newArr;
-      keywordRepositories.updateKeywordById(_id.toString(), k);
+      console.log(`${keyword} is done`);
+      await keywordRepositories.updateKeywordById(_id.toString(), k);
     }
   } catch (e) {
     console.log(e);
