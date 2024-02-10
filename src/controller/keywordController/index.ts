@@ -413,6 +413,7 @@ export const fixTheKeywords = async () => {
       console.log(`${keyword} is done`);
       await keywordRepositories.updateKeywordById(_id.toString(), k);
     }
+    console.log("keyword is done");
   } catch (e) {
     console.log(e);
   }
