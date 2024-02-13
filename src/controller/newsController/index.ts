@@ -116,6 +116,7 @@ export const getNewsByIdClient = async (req: Request, res: Response) => {
   try {
     const response = await newsRepositories.getNewsByIdWithoutVote(id);
     const contentToSend = clone(response) as any;
+    contentToSend.img = `https://api.yvoting.com/images/news/${id}`;
     contentToSend.comments =
       Object.keys((contentToSend as NewsInf)?.comments ?? {}) ?? [];
     res.send({

@@ -69,6 +69,7 @@
                 right: string;
               };
               comments: Array<Comment>;
+              img : string;
             }
           }
         }
