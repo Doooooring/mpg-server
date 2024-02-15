@@ -81,7 +81,6 @@ app.use("/vote", voteRoute);
 app.use("/admin/news", newsAdminRoute);
 app.use("/admin/keywords", keywordAdminRoute);
 
-
 app.use("*", (req: Request, res: Response) => {
   res.send("not existing paths");
 });
