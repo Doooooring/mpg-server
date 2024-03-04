@@ -44,7 +44,7 @@ class NewsRepositories {
         },
         {
           $addFields: {
-            lastTimelineDate: {
+            date: {
               $let: {
                 vars: {
                   lastTimelineEntry: {
@@ -58,10 +58,16 @@ class NewsRepositories {
                 in: { $ifNull: ["$$lastTimelineEntry.date", "0000.00"] },
               },
             },
+            img: {
+              $concat: [
+                "https://api.yvoting.com/images/news/",
+                { $toString: "$_id" }, // Convert ObjectId to string
+              ],
+            },
           },
         },
         {
-          $sort: { state: -1, lastTimelineDate: -1 },
+          $sort: { state: -1, date: -1 },
         },
         {
           $project: {
@@ -70,6 +76,8 @@ class NewsRepositories {
             summary: 1,
             keywords: 1,
             state: 1,
+            date: 1,
+            img: 1,
           },
         },
         {
@@ -105,7 +113,7 @@ class NewsRepositories {
     return News.aggregate([
       {
         $addFields: {
-          lastTimelineDate: {
+          date: {
             $let: {
               vars: {
                 lastTimelineEntry: {
@@ -128,7 +136,7 @@ class NewsRepositories {
         },
       },
       {
-        $sort: { state: -1, lastTimelineDate: -1 },
+        $sort: { state: -1, date: -1 },
       },
       {
         $project: {
@@ -137,7 +145,7 @@ class NewsRepositories {
           summary: 1,
           keywords: 1,
           state: 1,
-          lastTimelineDate: 1,
+          date: 1,
           img: 1,
         },
       },
