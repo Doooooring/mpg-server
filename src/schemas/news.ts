@@ -10,6 +10,10 @@ const newsSchema = new Schema<NewsInf>(
     summary: { type: String, require: true },
     keywords: { type: [String], require: true },
     state: { type: Boolean, require: true },
+    isPublished: {
+      type: Boolean,
+      require: true,
+    },
     opinions: {
       type: {
         left: String,
@@ -49,8 +53,6 @@ newsSchema.virtual("lastTimelineDate").get(function () {
   return lastTimelineEntry ? lastTimelineEntry.date : "0000.00";
 });
 
-newsSchema.index({
-  
-})
+newsSchema.index({});
 
 export const News = mongoose.model<NewsInf>("News", newsSchema);

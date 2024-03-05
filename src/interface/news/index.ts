@@ -26,6 +26,7 @@ export interface NewsInf {
   summary: string;
   keywords: Array<string>;
   state: Boolean;
+  isPublished: Boolean;
   opinions: {
     left: string;
     right: string;

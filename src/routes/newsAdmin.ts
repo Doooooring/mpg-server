@@ -7,6 +7,7 @@ import {
   deleteNewsData,
   getNewsById,
   getNewsTitle,
+  migrateNewsIsPublished,
   postNewsImageById,
   updateNewsData,
 } from "../controller/newsController";
@@ -25,6 +26,8 @@ router.route("/title").get(getNewsTitle);
 router.route("/img/:id").get().post(upload.single("img"), postNewsImageById);
 
 router.route("/:id").get(getNewsById);
+
+//router.route("/migrate/isPublished").get(migrateNewsIsPublished);
 
 router
   .route("/")

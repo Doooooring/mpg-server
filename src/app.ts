@@ -4,6 +4,7 @@ import express, { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 
+import { migrateNewsIsPublished } from "./controller/newsController";
 import { authRoute } from "./routes/auth";
 import { keywordRoute } from "./routes/keywords";
 import { keywordAdminRoute } from "./routes/keywordsAdmin";
@@ -81,7 +82,6 @@ app.use("/vote", voteRoute);
 app.use("/admin/news", newsAdminRoute);
 app.use("/admin/keywords", keywordAdminRoute);
 
-
 app.use("*", (req: Request, res: Response) => {
   res.send("not existing paths");
 });
@@ -91,3 +91,4 @@ app.listen(app.get("port"), () => {
 });
 
 // fixTheKeywords();
+migrateNewsIsPublished();

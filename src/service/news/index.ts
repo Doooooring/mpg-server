@@ -24,7 +24,8 @@ class NewsRepositories {
   getNewsInShortByIdList = async (
     page: number,
     news: string[],
-    limit: number
+    limit: number,
+    isAdmin: boolean
   ) => {
     try {
       const newsIdList = news.map((id) => {
@@ -36,11 +37,18 @@ class NewsRepositories {
           return "";
         }
       });
+
+      const $match = {
+        _id: { $in: newsIdList },
+      } as any;
+
+      if (!isAdmin) {
+        $match.isPublished = true;
+      }
+
       return News.aggregate([
         {
-          $match: {
-            _id: { $in: newsIdList },
-          },
+          $match,
         },
         {
           $addFields: {
@@ -109,8 +117,21 @@ class NewsRepositories {
   //     .limit(limit);
   // };
 
-  getNewsInShort = async (page: number, limit: number) => {
+  getNewsInShort = async (
+    page: number,
+    limit: number,
+    isAdmin: boolean = false
+  ) => {
+    const $match = {} as any;
+
+    if (!isAdmin) {
+      $match.isPublished = true;
+    }
+
     return News.aggregate([
+      {
+        $match,
+      },
       {
         $addFields: {
           date: {
@@ -236,6 +257,10 @@ class NewsRepositories {
       },
       news
     );
+  };
+
+  updateNewsMany = async (condition: any, news: Partial<NewsInf>) => {
+    return News.updateMany(condition, news);
   };
 
   pushKeywordToNews = async (news: string[], keyword: string) => {

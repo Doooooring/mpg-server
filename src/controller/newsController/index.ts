@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
-import { News } from "../..//schemas/news";
 import { NewsInf, commentType } from "../../interface/news";
 import { keywordRepositories } from "../../service/keyword";
 import { newsRepositories } from "../../service/news";
@@ -17,7 +16,7 @@ export const getNewsIds = async (req: Request, res: Response) => {
 };
 
 export const getNewsPreviewList = async (req: Request, res: Response) => {
-  const { page = 0, limit = 20, keyword = "" } = req.query;
+  const { page = 0, limit = 20, keyword = "", isAdmin = false } = req.query;
   if (Number(page) === -1) {
     res.send({
       success: false,
@@ -31,7 +30,8 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
     try {
       const newsContents = await newsRepositories.getNewsInShort(
         Number(page),
-        Number(limit)
+        Number(limit),
+        Boolean(isAdmin)
       );
       res.send({
         success: true,
@@ -66,7 +66,8 @@ export const getNewsPreviewList = async (req: Request, res: Response) => {
       const newsContents = await newsRepositories.getNewsInShortByIdList(
         Number(page),
         news,
-        Number(limit)
+        Number(limit),
+        Boolean(isAdmin)
       );
       res.send({
         success: true,
@@ -615,19 +616,17 @@ export const deleteNewsData = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteNewsAll = async (req: Request, res: Response) => {
+export const migrateNewsIsPublished = async () => {
   try {
-    const response = await News.deleteMany({});
-    res.send({
-      success: true,
-      result: {},
-    });
-    return;
-  } catch (e) {
-    res.status(500).send({
-      success: false,
-      result: {},
-    });
+    const response = await newsRepositories.updateNewsMany(
+      {},
+      {
+        isPublished: true,
+      }
+    );
+    console.log("is done");
+  } catch (e: any) {
+    console.log("is error");
   }
 };
 
