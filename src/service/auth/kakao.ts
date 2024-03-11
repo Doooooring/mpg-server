@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const KAKAO_API_URL = "https://kapi.kakao.com/v2/";
+export const KAKAO_API_URL = "https://kapi.kakao.com";
 export const KAKAO_AUTH_URL = "https://kauth.kakao.com";
 
 class KakaoRepositories {

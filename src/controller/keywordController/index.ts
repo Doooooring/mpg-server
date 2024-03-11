@@ -156,7 +156,8 @@ export const getKeywordWithNewsData = async (req: Request, res: Response) => {
   const previews = await newsRepositories.getNewsInShortByIdList(
     Number(page),
     news,
-    Number(limit)
+    Number(limit),
+    false
   );
   const response = {
     keyword: keyword,
