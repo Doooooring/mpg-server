@@ -187,7 +187,6 @@ export const addKeyword = async (req: Request, res: Response) => {
   }
   try {
     const isRecent = await newsRepositories.getNewsByIdAndState(news, true);
-    console.log("isRecent", isRecent);
 
     const response1 = await keywordRepositories.postKeyword({
       ...newKeyword,

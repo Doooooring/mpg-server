@@ -10,13 +10,16 @@ class GoogleRepositories {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      console.log("try google login repositories !!!!!!!");
+      console.log(`data  : ${response.data}`);
+
       return response.data;
     } catch (e) {
       console.log(e);
       return e;
     }
   };
-  
 }
 
 export const googleRepositories = new GoogleRepositories();

@@ -15,6 +15,10 @@ class KakaoRepositories {
           property_keys: properties,
         },
       });
+
+      console.log("try kakao login repositories !!!!!!!");
+      console.log(`data  : ${response.data}`);
+
       return response.data;
     } catch (e) {
       console.log(e);

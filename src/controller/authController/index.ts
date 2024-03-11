@@ -62,11 +62,18 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     const data = await kakaoRepositories.getUserInfoByToken(token, properties);
 
     const { name, email } = data.kakao_account;
+    console.log("try kakao login controller !!!!!!!!");
+    console.log(`email  : ${email},  name : ${name}`);
 
     await upsertUser(email, name, Platform.KAKAO);
 
     const yVoteToken = issueYVoteToken(email, Platform.KAKAO);
     const refreshToken = issueRefreshToken(email, Platform.KAKAO);
+
+    console.log("issue login token !!!!!!!!");
+    console.log(`acceess : ${yVoteToken},  refresh : ${refreshToken}`);
+
+    console.log("end logging kakao _______________________________________");
 
     res.send({
       success: true,
@@ -100,11 +107,18 @@ export const googleLogin = async (req: Request, res: Response) => {
     const data = await googleRepositories.getUserInfoByToken(token);
 
     const { name, email } = data;
+    console.log("try google login controller !!!!!!!!");
+    console.log(`email  : ${email},  name : ${name}`);
 
     await upsertUser(email, name, Platform.GOOGLE);
 
     const yVoteToken = issueYVoteToken(email, Platform.GOOGLE);
     const refreshToken = issueRefreshToken(email, Platform.GOOGLE);
+
+    console.log("issue login token !!!!!!!!");
+    console.log(`acceess : ${yVoteToken},  refresh : ${refreshToken}`);
+
+    console.log("end logging google _______________________________________");
 
     res.send({
       success: true,
