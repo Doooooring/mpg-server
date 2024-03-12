@@ -12,7 +12,7 @@ class KakaoRepositories {
       const response = await axios.post(
         `${KAKAO_API_URL}/v2/user/me`,
         {
-          property_keys: properties,
+          property_keys: JSON.stringify(properties),
         },
         {
           headers: {
