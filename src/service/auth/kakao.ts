@@ -9,15 +9,18 @@ class KakaoRepositories {
     console.log(JSON.stringify(properties));
 
     try {
-      const response = await axios.get(`${KAKAO_API_URL}/v2/user/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+      const response = await axios.post(
+        `${KAKAO_API_URL}/v2/user/me`,
+        {
+          property_keys: properties,
         },
-        params: {
-          property_keys: JSON.stringify(properties),
-        },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+          },
+        }
+      );
 
       console.log("try kakao login repositories !!!!!!!");
       console.log(`data  : ${response.data}`);
