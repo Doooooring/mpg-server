@@ -12,7 +12,7 @@ class KakaoRepositories {
           "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
         },
         params: {
-          property_keys: properties,
+          property_keys: JSON.stringify(properties),
         },
       });
 
