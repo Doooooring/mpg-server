@@ -18,6 +18,7 @@ class KakaoRepositories {
 
       console.log("try kakao login repositories !!!!!!!");
       console.log(`data  : ${response.data}`);
+      console.log("data as string: ", JSON.stringify(response.data));
 
       return response.data;
     } catch (e) {
