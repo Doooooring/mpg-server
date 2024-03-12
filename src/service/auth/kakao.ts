@@ -11,9 +11,9 @@ class KakaoRepositories {
     try {
       const response = await axios.post(
         `${KAKAO_API_URL}/v2/user/me`,
-        {
-          property_keys: JSON.stringify(properties),
-        },
+        // {
+        //   property_keys: JSON.stringify(properties),
+        // },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -26,7 +26,7 @@ class KakaoRepositories {
       console.log(`data  : ${response.data}`);
       console.log("data as string: ", JSON.stringify(response.data));
 
-      return response.data.properties;
+      return response.data.kakao_account;
     } catch (e) {
       console.log(e);
       return e;
