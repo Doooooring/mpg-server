@@ -61,7 +61,7 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     const token = bearerParse(auth);
     const data = await kakaoRepositories.getUserInfoByToken(token, properties);
 
-    const { name, email } = data.kakao_account;
+    const { name, email } = data;
     console.log("try kakao login controller !!!!!!!!");
     console.log(`email  : ${email},  name : ${name}`);
 
