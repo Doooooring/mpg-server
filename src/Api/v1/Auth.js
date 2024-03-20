@@ -41,6 +41,29 @@
  */
 
 /**
+ * @api {post} /auth/apple/login Request Login on Apple
+ * 
+ * @apiVersion        1.0.0
+ * @apiName AppleLogin
+ * @apiGroup Auth
+ *
+ * @apiHeader {String} Authorization='Bearer ${string}'
+ *
+ * @apiBody {id=String} apple user id   
+ * 
+ * @apiSuccessExample Success-Response:
+ *      HTTP/1.1 200 OK
+ *      {
+            success : boolean, 
+            result : {
+                yVoteToken : string,
+                email : string,
+                name : string
+            }
+        }
+ */
+
+/**
  * @api {post} /auth/refresh Refresh access token
  * 
  * @apiVersion        1.0.0

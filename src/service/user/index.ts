@@ -5,6 +5,12 @@ import { User } from "../../schemas/user";
 const ObjectId = mongoose.Types.ObjectId;
 
 class UserRepositories {
+  getUserById = async (id: string) => {
+    return User.find({
+      id,
+    });
+  };
+
   getUserByEmail = async (email: string) => {
     return User.find({
       email,

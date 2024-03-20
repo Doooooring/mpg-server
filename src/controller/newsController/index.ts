@@ -457,9 +457,9 @@ export const getVoteInfoByNewsId = async (req: Request, res: Response) => {
       state: boolean;
       payload: TokenPayload;
     };
-    const { email } = payload as TokenPayload;
+    const { id: userId } = payload as TokenPayload;
     const prevVote = await voteRepositories.getVoteInfo({
-      user: email,
+      user: userId,
       news: id,
     });
 
@@ -503,20 +503,20 @@ export const voteByNewsData = async (req: Request, res: Response) => {
     const token = bearerParse(auth!);
     const {
       state,
-      payload: { email },
+      payload: { id: userId },
     } = verifyYVoteToken(token as string) as {
       state: boolean;
       payload: TokenPayload;
     };
 
     const prevVote = await voteRepositories.getVoteInfo({
-      user: email,
+      user: userId,
       news: id,
     });
 
     if (!prevVote) {
       const voteRes = await voteRepositories.postVoteToNews(
-        email,
+        userId,
         id,
         response
       );
@@ -557,9 +557,9 @@ export const deleteNewsVoteInfo = async (req: Request, res: Response) => {
     if (!state) {
       throw new Error("TokenNotValidated");
     }
-    const { email } = payload as TokenPayload;
+    const { id: userId } = payload as TokenPayload;
 
-    await voteRepositories.deleteVote(email, id);
+    await voteRepositories.deleteVote(userId, id);
 
     res.send({
       state: true,

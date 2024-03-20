@@ -24,7 +24,7 @@ export const adminLogin = async (req: Request, res: Response) => {
     const yVoteToken = issueYVoteToken(admin.email, Platform.ADMIN);
     const refreshToken = issueRefreshToken(admin.email, Platform.ADMIN);
 
-    await upsertUser(email, name, Platform.ADMIN);
+    await upsertUser("admin", email, name, Platform.ADMIN);
 
     res.send({
       success: true,
@@ -61,14 +61,14 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     const token = bearerParse(auth);
     const data = await kakaoRepositories.getUserInfoByToken(token, properties);
 
-    const { name, email } = data;
+    const { id, name = "", email = "" } = data;
     console.log("try kakao login controller !!!!!!!!");
     console.log(`email  : ${email},  name : ${name}`);
 
-    await upsertUser(email, name, Platform.KAKAO);
+    await upsertUser(id, email, name, Platform.KAKAO);
 
-    const yVoteToken = issueYVoteToken(email, Platform.KAKAO);
-    const refreshToken = issueRefreshToken(email, Platform.KAKAO);
+    const yVoteToken = issueYVoteToken(id, Platform.KAKAO);
+    const refreshToken = issueRefreshToken(id, Platform.KAKAO);
 
     console.log("issue login token !!!!!!!!");
     console.log(`acceess : ${yVoteToken},  refresh : ${refreshToken}`);
@@ -106,14 +106,54 @@ export const googleLogin = async (req: Request, res: Response) => {
 
     const data = await googleRepositories.getUserInfoByToken(token);
 
-    const { name, email } = data;
+    const { id, name = "", email = "" } = data;
     console.log("try google login controller !!!!!!!!");
-    console.log(`email  : ${email},  name : ${name}`);
+    console.log(`id : ${id}, email  : ${email},  name : ${name}`);
 
-    await upsertUser(email, name, Platform.GOOGLE);
+    await upsertUser(id, email, name, Platform.GOOGLE);
 
-    const yVoteToken = issueYVoteToken(email, Platform.GOOGLE);
-    const refreshToken = issueRefreshToken(email, Platform.GOOGLE);
+    const yVoteToken = issueYVoteToken(id, Platform.GOOGLE);
+    const refreshToken = issueRefreshToken(id, Platform.GOOGLE);
+
+    console.log("issue login token !!!!!!!!");
+    console.log(`acceess : ${yVoteToken},  refresh : ${refreshToken}`);
+
+    console.log("end logging google _______________________________________");
+
+    res.send({
+      success: true,
+      result: {
+        access: yVoteToken,
+        refresh: refreshToken,
+        name,
+        email,
+      },
+    });
+  } catch (e) {
+    console.log("google login error", e);
+    res.status(401).send({
+      success: false,
+      result: e,
+    });
+  }
+};
+
+export const appleLogin = async (req: Request, res: Response) => {
+  try {
+    const {
+      id,
+      email = "",
+      name = "",
+    }: { id: string; email?: string; name?: string } = req.body;
+
+    if (!auth) {
+      throw new Error("User token is not defined");
+    }
+
+    await upsertUser(id, email, name, Platform.APPLE);
+
+    const yVoteToken = issueYVoteToken(id, Platform.APPLE);
+    const refreshToken = issueRefreshToken(id, Platform.APPLE);
 
     console.log("issue login token !!!!!!!!");
     console.log(`acceess : ${yVoteToken},  refresh : ${refreshToken}`);
@@ -183,12 +223,12 @@ export const tokenRefresh = (req: Request, res: Response) => {
       return;
     }
 
-    const { email, platform } = response.payload as {
-      email: string;
+    const { id, platform } = response.payload as {
+      id: string;
       platform: Platform;
     };
 
-    const accessToken = issueYVoteToken(email, platform);
+    const accessToken = issueYVoteToken(id, platform);
     res.send({
       state: true,
       result: {

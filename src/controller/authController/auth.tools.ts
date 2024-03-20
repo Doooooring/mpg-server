@@ -2,6 +2,7 @@ import { Platform } from "../../interface/common";
 import { userRepositories } from "../../service/user";
 
 export const upsertUser = async (
+  id: string,
   email: string,
   name: string,
   platform: Platform

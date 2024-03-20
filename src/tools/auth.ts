@@ -5,13 +5,13 @@ const ACCESS_SECRET = "YVOTEAccEsSecret";
 const REFRESH_SECRET = "YVOTERefrESHSecret";
 
 export interface TokenPayload {
-  email: string;
+  id: string;
   platform: Platform;
 }
 
-export const issueYVoteToken = (email: string, platform: Platform) => {
+export const issueYVoteToken = (id: string, platform: Platform) => {
   const payload = {
-    email,
+    id,
     platform,
   };
 
