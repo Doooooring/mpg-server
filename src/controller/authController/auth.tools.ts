@@ -8,13 +8,15 @@ export const upsertUser = async (
   platform: Platform
 ) => {
   try {
-    const user = await userRepositories.getUserInfoByEmailAndPlatform(
-      email,
-      platform
-    );
+    const user = await userRepositories.getUserInfoById(id);
 
     if (!user) {
-      const response = await userRepositories.postUser(email, name, platform);
+      const response = await userRepositories.postUser(
+        id,
+        email,
+        name,
+        platform
+      );
     }
     return true;
   } catch (e) {

@@ -17,6 +17,12 @@ class UserRepositories {
     });
   };
 
+  getUserInfoById = async (id: string) => {
+    return User.findOne({
+      id,
+    });
+  };
+
   getUserInfoByEmailAndPlatform = async (email: string, platform: Platform) => {
     return User.findOne({
       email,
@@ -24,8 +30,14 @@ class UserRepositories {
     });
   };
 
-  postUser = async (email: string, name: string, platform: Platform) => {
+  postUser = async (
+    id: string,
+    email: string,
+    name: string,
+    platform: Platform
+  ) => {
     return User.create({
+      id,
       email,
       name,
       platform,

@@ -499,6 +499,9 @@ export const voteByNewsData = async (req: Request, res: Response) => {
   const id = req.params.id as string;
   const auth = req.headers.authorization;
   const response = req.body.response as "left" | "right" | "none";
+
+  console.log("vote try !! : ", auth);
+
   try {
     const token = bearerParse(auth!);
     const {
@@ -509,6 +512,9 @@ export const voteByNewsData = async (req: Request, res: Response) => {
       payload: TokenPayload;
     };
 
+    console.log("-----------------token info---------------------");
+    console.log("state : ", state);
+    console.log("userId : ", userId);
     const prevVote = await voteRepositories.getVoteInfo({
       user: userId,
       news: id,
