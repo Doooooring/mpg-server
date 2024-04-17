@@ -63,7 +63,8 @@ export const kakaoLogin = async (req: Request, res: Response) => {
 
     const { id, name = "", email = "" } = data;
     console.log("try kakao login controller !!!!!!!!");
-    console.log(`email  : ${email},  name : ${name}`);
+
+    console.log(`email  : ${email},  name : ${name}, id : ${id}`);
 
     await upsertUser(id, email, name, Platform.KAKAO);
 

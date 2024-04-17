@@ -504,13 +504,13 @@ export const voteByNewsData = async (req: Request, res: Response) => {
 
   try {
     const token = bearerParse(auth!);
-    const {
-      state,
-      payload: { id: userId },
-    } = verifyYVoteToken(token as string) as {
+    const val = verifyYVoteToken(token as string) as {
       state: boolean;
       payload: TokenPayload;
     };
+    const { state, payload } = val;
+    console.log(`val : ${val}, payload :  ${payload}`);
+    const userId = payload.id;
 
     console.log("-----------------token info---------------------");
     console.log("state : ", state);
