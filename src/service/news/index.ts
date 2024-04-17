@@ -75,7 +75,7 @@ class NewsRepositories {
           },
         },
         {
-          $sort: { state: -1, date: -1 },
+          $sort: { state: -1, date: -1, _id: -1 },
         },
         {
           $project: {
@@ -157,7 +157,7 @@ class NewsRepositories {
         },
       },
       {
-        $sort: { state: -1, date: -1 },
+        $sort: { state: -1, date: -1, _id: -1 },
       },
       {
         $project: {
