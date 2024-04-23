@@ -2,12 +2,8 @@ import axios from "axios";
 
 export const KAKAO_API_URL = "https://kapi.kakao.com";
 export const KAKAO_AUTH_URL = "https://kauth.kakao.com";
-
 class KakaoRepositories {
   getUserInfoByToken = async (token: string, properties: string[]) => {
-    console.log("______________");
-    console.log(JSON.stringify(properties));
-
     try {
       const response = await axios.get(`${KAKAO_API_URL}/v2/user/me`, {
         headers: {
@@ -17,10 +13,8 @@ class KakaoRepositories {
       });
 
       console.log("try kakao login repositories !!!!!!!");
-      console.log(`data  : ${response.data}`);
-      console.log("data as string: ", JSON.stringify(response.data));
 
-      return response.data.kakao_account;
+      return response.data;
     } catch (e) {
       console.log(e);
       return e;
