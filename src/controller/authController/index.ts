@@ -70,7 +70,7 @@ export const kakaoLogin = async (req: Request, res: Response) => {
 
     console.log(`email  : ${email},  name : ${name}, id : ${id}`);
 
-    if (id === undefined) throw new Error("Error for getting user info");
+    if (id === undefined) throw new Error("kakao login id undefined");
 
     await upsertUser(id, email, name, Platform.KAKAO);
 
