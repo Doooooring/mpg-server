@@ -20,7 +20,7 @@ class KakaoRepositories {
       console.log(`data  : ${response.data}`);
       console.log("data as string: ", JSON.stringify(response.data));
 
-      return response.data.kakao_account;
+      return response.data;
     } catch (e) {
       console.log(e);
       return e;

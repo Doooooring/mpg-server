@@ -261,9 +261,9 @@ export const getNewsComment = async (req: Request, res: Response) => {
     const newsContents = await newsRepositories.getCommentsById(id as string);
     if (newsContents === null) {
       Error("news contents doesn't exist");
-
       return;
     }
+     
     const page = parseInt(pageStr as string);
 
     /**

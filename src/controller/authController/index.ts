@@ -59,12 +59,18 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     ];
 
     const token = bearerParse(auth);
+    console.log("=======================================================")
+    console.log(token)
+    console.log("=======================================================")
+
     const data = await kakaoRepositories.getUserInfoByToken(token, properties);
 
     const { id, name = "", email = "" } = data;
     console.log("try kakao login controller !!!!!!!!");
 
     console.log(`email  : ${email},  name : ${name}, id : ${id}`);
+
+    if (id === undefined) throw new Error("Error for getting user info");
 
     await upsertUser(id, email, name, Platform.KAKAO);
 
@@ -79,7 +85,7 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     res.send({
       success: true,
       result: {
-        access: yVoteToken,
+        yVoteToken: yVoteToken,
         refresh: refreshToken,
         name,
         email,
@@ -124,7 +130,7 @@ export const googleLogin = async (req: Request, res: Response) => {
     res.send({
       success: true,
       result: {
-        access: yVoteToken,
+        yVoteToken: yVoteToken,
         refresh: refreshToken,
         name,
         email,
@@ -164,7 +170,7 @@ export const appleLogin = async (req: Request, res: Response) => {
     res.send({
       success: true,
       result: {
-        access: yVoteToken,
+        yVoteToken: yVoteToken,
         refresh: refreshToken,
         name,
         email,
