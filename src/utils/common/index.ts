@@ -3,5 +3,5 @@ export function clone<T>(obj: T) {
 }
 
 export function bearerParse(token: string) {
-  return token.split(" ")[1];
+  return token.trim().split(" ")[1];
 }
