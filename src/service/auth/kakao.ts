@@ -16,7 +16,7 @@ class KakaoRepositories {
 
       return response.data;
     } catch (e) {
-      console.log(e);
+      //console.log(e);
       return e;
     }
   };
