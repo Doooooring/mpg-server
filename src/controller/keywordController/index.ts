@@ -159,9 +159,14 @@ export const getKeywordWithNewsData = async (req: Request, res: Response) => {
     Number(limit),
     false
   );
+
+  const category = "etc";
+  // "I think you'd have to make a function for checking out the category of the keyword, but it's been too long since I've pulled the recent code nor am I similar with running the backend server on my computer so I'll leave this to you";
+
   const response = {
     keyword: keyword,
     previews: previews,
+    category: category, //inserted
   };
   res.send({
     success: true,
