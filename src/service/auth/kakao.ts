@@ -29,9 +29,9 @@ class KakaoRepositories {
         },
       });
       return response.data;
-    } catch (e) {
-      console.log(e);
-      return e;
+    } catch (e: any) {
+      console.log("kakao log error", e?.data?.msg);
+      return e?.data?.msg;
     }
   };
 }

@@ -59,9 +59,9 @@ export const kakaoLogin = async (req: Request, res: Response) => {
     ];
 
     const token = bearerParse(auth);
-    console.log("=======================================================")
-    console.log(token)
-    console.log("=======================================================")
+    console.log("=======================================================");
+    console.log(token);
+    console.log("=======================================================");
 
     const data = await kakaoRepositories.getUserInfoByToken(token, properties);
 
