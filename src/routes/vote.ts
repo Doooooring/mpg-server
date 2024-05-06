@@ -1,6 +1,6 @@
-import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import crypto from "crypto";
+import express, { Request, Response } from "express";
 
 import { News } from "../schemas/news";
 import { Vote } from "../schemas/vote";
@@ -183,10 +183,5 @@ router.route("/").post(async (req: Request, res: Response) => {
     }
   }
 });
-
-setInterval(async () => {
-  await Vote.deleteMany({});
-  console.log("Vote cleared");
-}, 24 * 60 * 60 * 1000);
 
 export const voteRoute = router;
