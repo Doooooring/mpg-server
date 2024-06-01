@@ -3,7 +3,9 @@ import { Request, Response } from "express";
 import { Platform } from "../../interface/common";
 import { googleRepositories } from "../../service/auth/google";
 import { kakaoRepositories } from "../../service/auth/kakao";
+import { userRepositories } from "../../service/user";
 import {
+  TokenPayload,
   issueRefreshToken,
   issueYVoteToken,
   verifyYVoteToken,
@@ -181,6 +183,36 @@ export const appleLogin = async (req: Request, res: Response) => {
     res.status(401).send({
       success: false,
       result: e,
+    });
+  }
+};
+
+export const withdrawal = async (req: Request, res: Response) => {
+  try {
+    const auth = req.headers.authorization;
+
+    console.log("withdrawl try!!");
+
+    const token = bearerParse(auth!);
+    const val = verifyYVoteToken(token) as {
+      state: boolean;
+      payload: TokenPayload;
+    };
+
+    const { state, payload } = val;
+
+    if (!state) throw Error("invalidToken");
+
+    const { id: userId } = payload;
+    const response = await userRepositories.deleteUser(userId);
+    res.send({
+      success: true,
+      result: {},
+    });
+  } catch (e) {
+    res.status(401).send({
+      success: false,
+      result: {},
     });
   }
 };

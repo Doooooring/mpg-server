@@ -43,6 +43,10 @@ class UserRepositories {
       platform,
     });
   };
+
+  deleteUser = async (id: string) => {
+    return User.deleteOne({ id: id });
+  };
 }
 
 export const userRepositories = new UserRepositories();
