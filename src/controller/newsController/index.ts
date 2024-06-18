@@ -94,7 +94,7 @@ export const getImageById = async (req: Request, res: Response) => {
 export const getNewsById = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const response = await newsRepositories.getNewsByIdWithoutVote(id);
+    const response = await newsRepositories.getNewsById(id);
     res.send({
       success: true,
       result: {
@@ -263,7 +263,7 @@ export const getNewsComment = async (req: Request, res: Response) => {
       Error("news contents doesn't exist");
       return;
     }
-     
+
     const page = parseInt(pageStr as string);
 
     /**

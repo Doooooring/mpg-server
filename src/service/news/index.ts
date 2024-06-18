@@ -301,6 +301,10 @@ class NewsRepositories {
       _id: _id,
     });
   };
+
+  deleteAll = async () => {
+    return News.deleteMany();
+  };
 }
 
 export const newsRepositories = new NewsRepositories();
