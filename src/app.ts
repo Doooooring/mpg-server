@@ -3,6 +3,7 @@ import cors from "cors";
 import express, { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
+import { sequelize } from "./models";
 
 import { authRoute } from "./routes/auth";
 import { keywordRoute } from "./routes/keywords";
@@ -85,7 +86,15 @@ app.use("*", (req: Request, res: Response) => {
   res.send("not existing paths");
 });
 
-app.listen(app.get("port"), () => {
+app.listen(app.get("port"), async () => {
+  await sequelize
+    .authenticate()
+    .then(async () => {
+      console.log("connection success");
+    })
+    .catch((e: any) => {
+      console.log("TT : ", e);
+    });
   console.log(app.get("port"), "번 포트에서 대기중");
 });
 

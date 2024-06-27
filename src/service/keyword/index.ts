@@ -155,6 +155,10 @@ class KeywordRepositories {
     });
   };
 
+  deleteKeywordAll = async () => {
+    return Keywords.deleteMany({});
+  };
+
   pullNewsInfoToKeywords = async (keywords: string[], news: string) => {
     return Keywords.updateMany(
       {

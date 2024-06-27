@@ -3,15 +3,9 @@ import fs from "fs";
 import { ObjectId } from "mongoose";
 import path from "path";
 import { category } from "../../interface/keyword";
-import { Keywords } from "../../schemas/keywords";
 import { News } from "../../schemas/news";
 import { keywordRepositories } from "../../service/keyword";
 import { newsRepositories } from "../../service/news";
-
-export const deleteKeywordAll = async (req: Request, res: Response) => {
-  const response = await Keywords.deleteMany({});
-  res.send(JSON.stringify(response));
-};
 
 export const getKeywords = async (req: Request, res: Response) => {
   const { search } = req.query;
