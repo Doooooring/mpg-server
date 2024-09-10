@@ -4,7 +4,6 @@ import express, { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 
-import { summaryToHtml } from "./mig";
 import { authRoute } from "./routes/auth";
 import { keywordRoute } from "./routes/keywords";
 import { keywordAdminRoute } from "./routes/keywordsAdmin";
@@ -93,4 +92,4 @@ app.listen(app.get("port"), () => {
 // fixTheKeywords();
 //migrateNewsIsPublished();
 
-summaryToHtml();
+//summaryToHtml();
