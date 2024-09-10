@@ -5,6 +5,7 @@ import cors from "cors";
 import fs from "fs";
 import path from "path";
 
+import { summaryToHtml } from "./mig";
 import { keywordRoute } from "./routes/keywords";
 import { keywordAdminRoute } from "./routes/keywordsAdmin";
 import { newsRoute } from "./routes/news";
@@ -70,3 +71,8 @@ app.use("*", (req: Request, res: Response) => {
 app.listen(app.get("port"), () => {
   console.log(app.get("port"), "번 포트에서 대기중");
 });
+
+// fixTheKeywords();
+//migrateNewsIsPublished();
+
+summaryToHtml();
