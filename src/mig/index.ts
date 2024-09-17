@@ -37,6 +37,25 @@ export const keywordMongmigrate = async () => {
   }
 };
 
-export const migrateMongToMy = async () => {
-    
-}
+export const migrateMongToMy = async () => {};
+
+export const summaryToHtml = async () => {
+  const ids = await newsRepositories.getNewsIds();
+
+  const maxCnt = ids.length;
+  for (let i = 0; i < maxCnt; i++) {
+    const { _id } = ids[i];
+    const news = await newsRepositories.getNewsById(_id.toString());
+    const summary = news?.summary;
+
+    const sumToHtml = summary
+      ?.split("$")
+      .reduce((prev, cur) => prev + `<p>${cur}</p>`, "");
+
+    await news?.updateOne({
+      summary: sumToHtml,
+    });
+
+    console.log("is updated : ", _id);
+  }
+};

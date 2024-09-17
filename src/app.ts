@@ -5,7 +5,11 @@ import fs from "fs";
 import path from "path";
 import { sequelize } from "./models";
 
+<<<<<<< HEAD
 import { authRoute } from "./routes/auth";
+=======
+import { summaryToHtml } from "./mig";
+>>>>>>> master
 import { keywordRoute } from "./routes/keywords";
 import { keywordAdminRoute } from "./routes/keywordsAdmin";
 import { newsRoute } from "./routes/news";
@@ -100,3 +104,4 @@ app.listen(app.get("port"), async () => {
 
 // fixTheKeywords();
 //migrateNewsIsPublished();
+//summaryToHtml
