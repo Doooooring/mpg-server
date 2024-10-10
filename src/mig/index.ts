@@ -1,4 +1,5 @@
 import axios from "axios";
+import { keywordRepositories } from "../service/keyword";
 import { newsRepositories } from "../service/news";
 
 const HOST_URL = "https://api.yvoting.com";
@@ -39,6 +40,24 @@ export const summaryToHtml = async () => {
     });
 
     console.log("is updated : ", _id);
+  }
+};
+
+export const explainToHtml = async () => {
+  const keywords = await keywordRepositories.getKeywordsAll();
+  const maxCnt = keywords.length;
+  for (let i = 0; i < maxCnt; i++) {
+    const keyword = keywords[i];
+
+    const expl = keyword?.explain
+      ?.split("$")
+      .reduce((prev: string, cur: string) => prev + `<p>${cur}</p>`, "");
+
+    await keyword.updateOne({
+      explain: expl,
+    });
+
+    console.log("is updated : ", keyword.keyword);
   }
 };
 
