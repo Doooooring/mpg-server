@@ -9,15 +9,12 @@ import { Keyword } from "./keyword";
 import { News } from "./news";
 
 @Table({ tableName: "NewsKeyword" })
-export class NewsKeyword extends Model<NewsKeyword> {
-  @Column({ primaryKey: true, type: DataType.STRING })
-  id!: string;
-
+export class NewsKeyword extends Model {
   @ForeignKey(() => News)
-  @Column(DataType.STRING)
-  news_id!: string;
+  @Column(DataType.INTEGER)
+  news_id!: number;
 
   @ForeignKey(() => Keyword)
-  @Column(DataType.STRING)
-  keyword_id!: string;
+  @Column(DataType.INTEGER)
+  keyword_id!: number;
 }

@@ -394,7 +394,7 @@ export const updateKeywordState = async (keyword: string) => {
 
 export const fixTheKeywords = async () => {
   try {
-    const keywords = await keywordRepositories.getKeywordsAll();
+    const keywords: any = await keywordRepositories.getKeywordsAll();
     for (let k of keywords) {
       const { _id, keyword, news } = k as {
         _id: ObjectId;

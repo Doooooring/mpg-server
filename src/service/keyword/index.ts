@@ -12,7 +12,7 @@ class KeywordRepositories {
   };
 
   getKeywordsAll = async () => {
-    return Keywords.find() as any;
+    return Keywords.find();
   };
 
   getKeywordByKey = async (keyword: string) => {

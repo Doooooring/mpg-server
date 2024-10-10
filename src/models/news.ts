@@ -1,36 +1,30 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 
-interface TimelineItem {
+export interface TimelineItem {
   date: string;
   title: string;
 }
 
 @Table({ tableName: "News" })
-export class News extends Model<News> {
-  @Column({ primaryKey: true, type: DataType.STRING })
-  id!: string;
-
+export class News extends Model {
   @Column(DataType.INTEGER)
-  order!: number;
+  order?: number;
 
   @Column(DataType.STRING)
-  title!: string;
+  title?: string;
 
-  @Column(DataType.STRING)
-  summary!: string;
+  @Column(DataType.TEXT)
+  summary?: string;
 
   @Column(DataType.BOOLEAN)
-  state!: boolean;
+  state?: boolean;
 
   @Column(DataType.BOOLEAN)
-  isPublished!: boolean;
+  isPublished?: boolean;
 
   @Column(DataType.STRING)
-  opinions_left!: string;
+  opinion_left?: string;
 
   @Column(DataType.STRING)
-  opinions_right!: string;
-
-  @Column(DataType.JSONB)
-  timeline!: TimelineItem[];
+  opinion_right?: string;
 }

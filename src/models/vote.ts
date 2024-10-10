@@ -9,7 +9,7 @@ import { News } from "./news";
 import { User } from "./user";
 
 @Table({ tableName: "Vote" })
-export class Vote extends Model<Vote> {
+export class Vote extends Model {
   @ForeignKey(() => News)
   @Column({ primaryKey: true, type: DataType.STRING })
   news_id!: string;

@@ -1,14 +1,11 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 @Table({ tableName: "Keyword" })
-export class Keyword extends Model<Keyword> {
-  @Column({ primaryKey: true, type: DataType.STRING })
-  id!: string;
-
+export class Keyword extends Model {
   @Column(DataType.STRING)
   keyword!: string;
 
-  @Column(DataType.STRING)
+  @Column(DataType.TEXT)
   explain!: string;
 
   @Column(DataType.STRING)

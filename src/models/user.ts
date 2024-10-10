@@ -1,10 +1,7 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 @Table({ tableName: "User" })
-export class User extends Model<User> {
-  @Column({ primaryKey: true, type: DataType.STRING })
-  id!: string;
-
+export class User extends Model {
   @Column(DataType.STRING)
   email!: string;
 
