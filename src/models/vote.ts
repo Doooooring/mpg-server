@@ -12,11 +12,11 @@ import { User } from "./user";
 export class Vote extends Model {
   @ForeignKey(() => News)
   @Column({ primaryKey: true, type: DataType.STRING })
-  news_id!: string;
+  newsId!: string;
 
   @ForeignKey(() => User)
   @Column({ primaryKey: true, type: DataType.STRING })
-  user_id!: string;
+  userId!: string;
 
   @Column(DataType.STRING)
   response!: string;
